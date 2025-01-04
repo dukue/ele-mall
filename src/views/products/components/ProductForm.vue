@@ -39,53 +39,55 @@
         </el-tab-pane>
 
         <!-- 多语言信息 -->
-        <el-tab-pane 
-          v-for="lang in languages" 
-          :key="lang.code"
-          :label="lang.name"
-          :name="lang.code"
-        >
-          <el-form-item :label="t('product.name')" :prop="`translations.${lang.code}.name`">
-            <el-input v-model="formData.translations[lang.code].name" />
-          </el-form-item>
-          <el-form-item :label="t('product.description')" :prop="`translations.${lang.code}.description`">
-            <el-input
-              v-model="formData.translations[lang.code].description"
-              type="textarea"
-              :rows="3"
-            />
-          </el-form-item>
-          <el-form-item :label="t('product.specifications')">
-            <el-card>
-              <template #header>
-                <div class="specifications-header">
-                  <span>{{ t('product.specifications') }}</span>
-                  <el-button type="primary" link @click="addSpecification(lang.code)">
-                    {{ t('product.addSpecification') }}
+        <template v-if="isLanguagesLoaded">
+          <el-tab-pane 
+            v-for="lang in languages" 
+            :key="lang.code"
+            :label="lang.name"
+            :name="lang.code"
+          >
+            <el-form-item :label="t('product.name')" :prop="`translations.${lang.code}.name`">
+              <el-input v-model="formData.translations[lang.code].name" />
+            </el-form-item>
+            <el-form-item :label="t('product.description')" :prop="`translations.${lang.code}.description`">
+              <el-input
+                v-model="formData.translations[lang.code].description"
+                type="textarea"
+                :rows="3"
+              />
+            </el-form-item>
+            <el-form-item :label="t('product.specifications')">
+              <el-card>
+                <template #header>
+                  <div class="specifications-header">
+                    <span>{{ t('product.specifications') }}</span>
+                    <el-button type="primary" link @click="addSpecification(lang.code)">
+                      {{ t('product.addSpecification') }}
+                    </el-button>
+                  </div>
+                </template>
+                <div
+                  v-for="(_, key) in formData.translations[lang.code].specifications"
+                  :key="key"
+                  class="specification-item"
+                >
+                  <el-input v-model="specKeys[lang.code][key]" :placeholder="t('product.specName')">
+                    <template #prepend>{{ t('product.specNameLabel') }}</template>
+                  </el-input>
+                  <el-input
+                    v-model="formData.translations[lang.code].specifications[key]"
+                    :placeholder="t('product.specValue')"
+                  >
+                    <template #prepend>{{ t('product.specValueLabel') }}</template>
+                  </el-input>
+                  <el-button type="danger" link @click="removeSpecification(lang.code, key)">
+                    {{ t('common.delete') }}
                   </el-button>
                 </div>
-              </template>
-              <div
-                v-for="(_, key) in formData.translations[lang.code].specifications"
-                :key="key"
-                class="specification-item"
-              >
-                <el-input v-model="specKeys[lang.code][key]" :placeholder="t('product.specName')">
-                  <template #prepend>{{ t('product.specNameLabel') }}</template>
-                </el-input>
-                <el-input
-                  v-model="formData.translations[lang.code].specifications[key]"
-                  :placeholder="t('product.specValue')"
-                >
-                  <template #prepend>{{ t('product.specValueLabel') }}</template>
-                </el-input>
-                <el-button type="danger" link @click="removeSpecification(lang.code, key)">
-                  {{ t('common.delete') }}
-                </el-button>
-              </div>
-            </el-card>
-          </el-form-item>
-        </el-tab-pane>
+              </el-card>
+            </el-form-item>
+          </el-tab-pane>
+        </template>
       </el-tabs>
     </el-form>
 
@@ -120,15 +122,43 @@ const formData = reactive({
   weight: 0,
   status: true,
   categoryId: undefined,
-  translations: {}
+  translations: {
+    zh: { name: '', description: '', specifications: {} },
+    en: { name: '', description: '', specifications: {} },
+    ja: { name: '', description: '', specifications: {} }
+  }
 })
 
 // 支持的语言列表
-const languages = ref([
-  { code: 'zh', name: '中文' },
-  { code: 'en', name: 'English' },
-  { code: 'ja', name: '日本語' }
-])
+const languages = ref([])
+
+// 添加语言加载状态标志
+const isLanguagesLoaded = ref(false)
+
+// 获取支持的语言列表
+const getLanguages = async () => {
+  try {
+    const { code, data } = await request.get('/i18n/languages')
+    if (code === 200) {
+      languages.value = data || []
+      // 初始化每种语言的翻译数据
+      languages.value.forEach(lang => {
+        if (!formData.translations[lang.code]) {
+          formData.translations[lang.code] = {
+            name: '',
+            description: '',
+            specifications: {}
+          }
+          specKeys[lang.code] = {}
+        }
+      })
+      isLanguagesLoaded.value = true
+    }
+  } catch (error) {
+    console.error('获取语言列表失败:', error)
+    ElMessage.error(t('common.getFailed'))
+  }
+}
 
 // 当前激活的语言标签
 const activeTab = ref('basic')
@@ -136,15 +166,24 @@ const activeTab = ref('basic')
 // 规格参数的key
 const specKeys = reactive({})
 
-// 初始化translations和specKeys
-languages.value.forEach(lang => {
-  formData.translations[lang.code] = {
-    name: '',
-    description: '',
-    specifications: {}
-  }
-  specKeys[lang.code] = {}
-})
+// 修改初始化translations的方法
+const initTranslations = () => {
+  // 保留现有的translations数据
+  const existingTranslations = { ...formData.translations }
+  // 重置translations
+  formData.translations = {}
+  languages.value.forEach(lang => {
+    formData.translations[lang.code] = {
+      // 如果有现有数据就使用现有数据，否则使用空值
+      ...existingTranslations[lang.code] || {
+        name: '',
+        description: '',
+        specifications: {}
+      }
+    }
+    specKeys[lang.code] = {}
+  })
+}
 
 // 表单验证规则
 const rules = {
@@ -240,9 +279,11 @@ const handleSubmit = async () => {
 
 // 监听visible变化
 const dialogVisible = ref(false)
-watch(() => props.visible, (val) => {
+watch(() => props.visible, async (val) => {
   dialogVisible.value = val
   if (val) {
+    isLanguagesLoaded.value = false
+    await getLanguages()
     // 当对话框打开时，重新获取分类列表
     getCategories()
     // 如果是编辑模式，需要初始化表单数据
@@ -250,7 +291,7 @@ watch(() => props.visible, (val) => {
       initFormData()
     } else {
       // 如果是添加模式，重置表单数据
-      resetFormData()
+      await resetFormData()
     }
   }
 })
@@ -337,21 +378,15 @@ const initFormData = () => {
 }
 
 // 添加重置表单数据的方法
-const resetFormData = () => {
+const resetFormData = async () => {
   formData.price = 0
   formData.weight = 0
   formData.status = true
   formData.categoryId = undefined
 
   // 重置多语言数据
-  languages.value.forEach(lang => {
-    formData.translations[lang.code] = {
-      name: '',
-      description: '',
-      specifications: {}
-    }
-    specKeys[lang.code] = {}
-  })
+  await getLanguages()
+  initTranslations()
 }
 </script>
 

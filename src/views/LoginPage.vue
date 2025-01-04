@@ -80,13 +80,21 @@ const login = () => {
     
     loading.value = true
     try {
-      const { token, userInfo } = await request.post('/auth/login', loginForm.value)
-      window.sessionStorage.setItem('token', token)
-      window.sessionStorage.setItem('userInfo', JSON.stringify(userInfo))
-      router.push('/home')
-      ElMessage.success('登录成功')
+      const { code, data, message } = await request.post('/auth/login', loginForm.value)
+      if (code === 200) {
+        // 保存 token
+        window.sessionStorage.setItem('token', data.token)
+        // 保存用户信息
+        window.sessionStorage.setItem('userInfo', JSON.stringify(data.userInfo))
+        
+        router.push('/home')
+        ElMessage.success(message || '登录成功')
+      } else {
+        ElMessage.error(message || '登录失败')
+      }
     } catch (error) {
       console.error('登录失败:', error)
+      ElMessage.error('登录失败，请检查用户名和密码')
     } finally {
       loading.value = false
     }

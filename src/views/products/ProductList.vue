@@ -30,18 +30,18 @@
         :data="productList" 
         border 
         stripe
-        height="calc(100vh - 280px)"
+        height="calc(100vh - 360px)"
       >
-        <el-table-column type="index" label="#" width="50" />
-        <el-table-column :label="t('product.name')" prop="name" />
+        <el-table-column type="index" label="#" width="60" />
+        <el-table-column :label="t('product.name')" prop="name" min-width="200" />
         <el-table-column :label="t('product.price')" width="120">
           <template #default="scope">
             ¥{{ scope.row.price }}
           </template>
         </el-table-column>
         <el-table-column :label="t('product.weight')" prop="weight" width="120" />
-        <el-table-column :label="t('product.category')" prop="category.name" width="120" />
-        <el-table-column :label="t('product.status')" width="120">
+        <el-table-column :label="t('product.category')" prop="category.name" width="140" />
+        <el-table-column :label="t('product.status')" width="100">
           <template #default="scope">
             <el-switch
               v-model="scope.row.status"
@@ -49,16 +49,26 @@
             />
           </template>
         </el-table-column>
-        <el-table-column :label="t('common.operation')" width="180">
+        <el-table-column :label="t('common.operation')" width="200" fixed="right">
           <template #default="scope">
-            <el-button-group>
-              <el-button type="primary" :icon="Edit" @click="showEditDialog(scope.row)">
+            <div class="operation-buttons">
+              <el-button 
+                type="primary" 
+                size="small"
+                @click="showEditDialog(scope.row)"
+              >
+                <el-icon><Edit /></el-icon>
                 {{ t('common.edit') }}
               </el-button>
-              <el-button type="danger" :icon="Delete" @click="removeProduct(scope.row.id)">
+              <el-button 
+                type="danger" 
+                size="small"
+                @click="removeProduct(scope.row.id)"
+              >
+                <el-icon><Delete /></el-icon>
                 {{ t('common.delete') }}
               </el-button>
-            </el-button-group>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -71,6 +81,7 @@
           :page-sizes="[5, 10, 15, 20]"
           layout="total, sizes, prev, pager, next, jumper"
           :total="total"
+          background
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
         />
@@ -131,7 +142,16 @@ const getProductList = async () => {
       }
     })
     if (code === 200 && data) {
-      productList.value = data.products || []
+      // 处理商品数据，确保分类名称正确显示
+      productList.value = data.products.map(product => ({
+        ...product,
+        category: {
+          ...product.category,
+          name: product.category?.translations?.[queryInfo.value.lang]?.name || 
+                product.category?.name ||
+                t('product.unknownCategory')
+        }
+      }))
       total.value = data.total || 0
     } else {
       ElMessage.error(message || t('product.listFailed'))
@@ -139,6 +159,8 @@ const getProductList = async () => {
   } catch (error) {
     console.error('获取商品列表失败:', error)
     ElMessage.error(t('product.listFailed'))
+    productList.value = []
+    total.value = 0
   }
 }
 
@@ -236,38 +258,116 @@ onMounted(() => {
 }
 
 .product-card {
-  height: calc(100% - 40px);
+  height: 100%;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
 }
 
 .search-box {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .el-card :deep(.el-card__body) {
   height: 100%;
   display: flex;
   flex-direction: column;
+  padding: 15px 20px;
 }
 
 .pagination-container {
-  margin-top: 20px;
+  margin-top: 15px;
   display: flex;
   justify-content: flex-end;
+  padding: 10px 0;
 }
 
 .el-table {
   flex: 1;
-  overflow: hidden;
+  margin-bottom: 0;
 }
 
 .el-table :deep(.el-table__body-wrapper) {
   overflow-y: auto;
 }
 
+.el-table :deep(tbody tr:hover) {
+  background-color: #f5f7fa !important;
+}
+
 .el-button-group {
   display: flex;
-  gap: 10px;
+  gap: 8px;
+}
+
+.el-input {
+  :deep(.el-input__wrapper) {
+    box-shadow: 0 0 0 1px #dcdfe6 inset;
+  }
+  :deep(.el-input__wrapper:hover) {
+    box-shadow: 0 0 0 1px #409eff inset;
+  }
+}
+
+.el-button {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+:deep(.el-pagination.is-background) {
+  .el-pagination__total,
+  .el-pagination__sizes {
+    margin-right: 15px;
+  }
+  .btn-prev,
+  .btn-next,
+  .el-pager li {
+    margin: 0 4px;
+    min-width: 32px;
+    border-radius: 4px;
+  }
+}
+
+.operation-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.operation-buttons .el-button {
+  padding: 8px 12px;
+  min-width: 80px;
+}
+
+.el-table {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.el-table :deep(.el-table__body-wrapper) {
+  overflow-y: auto;
+}
+
+.el-table :deep(.el-table__row) {
+  height: 50px;
+}
+
+.el-table :deep(.el-table__fixed-right) {
+  height: 100%;
+  right: 0;
+  background-color: #fff;
+}
+
+.el-table :deep(.el-table__fixed-right::before) {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  background: linear-gradient(to right, rgba(0,0,0,0.15), rgba(0,0,0,0));
+  pointer-events: none;
 }
 </style> 

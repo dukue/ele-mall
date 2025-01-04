@@ -9,12 +9,22 @@
         <LangSwitch />
         <el-dropdown>
           <span class="user-info">
+            <el-avatar 
+              v-if="userInfo.avatar" 
+              :size="32" 
+              :src="userInfo.avatar"
+            />
             {{ username }}
             <el-icon class="el-icon--right"><arrow-down /></el-icon>
           </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item @click="logout">{{ $t('common.logout') }}</el-dropdown-item>
+              <el-dropdown-item disabled>
+                {{ userInfo.role === 'admin' ? '管理员' : '普通用户' }}
+              </el-dropdown-item>
+              <el-dropdown-item divided @click="logout">
+                {{ t('common.logout') }}
+              </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -95,11 +105,21 @@ const isCollapse = ref(false)
 const activePath = ref('')
 const breadcrumbItems = ref(['', ''])
 
-// 获取用户名
-const username = computed(() => {
-  const userInfo = JSON.parse(sessionStorage.getItem('userInfo') || '{}')
-  return userInfo.username || 'User'
+// 获取用户信息
+const userInfo = computed(() => {
+  try {
+    const userInfoStr = window.sessionStorage.getItem('userInfo')
+    if (!userInfoStr) return { username: 'User' }
+    
+    return JSON.parse(userInfoStr)
+  } catch (error) {
+    console.error('解析用户信息失败:', error)
+    return { username: 'User' }
+  }
 })
+
+// 用户名显示
+const username = computed(() => userInfo.value.username)
 
 // 退出登录
 const logout = async () => {
@@ -144,6 +164,7 @@ onMounted(() => {
 // 图标映射
 const iconList = {
   1: House,
+  6: Location,
   2: Shop,
   3: Tickets,
   4: User,
@@ -166,6 +187,31 @@ const menuList = ref([
     ]
   },
   {
+    id: 6,
+    authName: 'menu.crossBorder.title',
+    path: '/crossborder',
+    children: [
+      {
+        id: 61,
+        authName: 'menu.i18n.languages',
+        path: '/home/languages',
+        langKey: 'menu.i18n.languages'
+      },
+      {
+        id: 62,
+        authName: 'menu.exchange.title',
+        path: '/home/exchange',
+        langKey: 'menu.exchange.title'
+      },
+      {
+        id: 63,
+        authName: 'menu.warehouse.title',
+        path: '/home/warehouse',
+        langKey: 'menu.warehouse.title'
+      }
+    ]
+  },
+  {
     id: 2,
     authName: 'menu.products.title',
     path: '/products',
@@ -175,6 +221,12 @@ const menuList = ref([
         authName: 'menu.products.list',
         path: '/products',
         langKey: 'menu.products.list'
+      },
+      {
+        id: 22,
+        authName: 'menu.products.categories',
+        path: '/categories',
+        langKey: 'menu.products.categories'
       }
     ]
   },
@@ -228,6 +280,7 @@ const getMenuTitle = computed(() => (authName) => t(authName))
   height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .el-header {
@@ -244,30 +297,40 @@ const getMenuTitle = computed(() => (authName) => t(authName))
 .el-container {
   flex: 1;
   display: flex;
+  overflow: hidden;
 }
 
 .el-aside {
   background-color: #333744;
   transition: width 0.3s;
-  height: calc(100vh - 60px);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.el-menu {
+  border-right: none;
+  flex: 1;
   overflow-y: auto;
 }
 
 .el-main {
   background-color: #eaedf1;
   padding: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.el-main > :last-child {
+  flex: 1;
   overflow-y: auto;
+  margin-top: 20px;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-}
-
-.header-left img {
-  width: 40px;
-  height: 40px;
-  margin-right: 15px;
 }
 
 .header-right {
@@ -286,7 +349,18 @@ const getMenuTitle = computed(() => (authName) => t(authName))
   cursor: pointer;
 }
 
-.el-menu {
-  border-right: none;
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.el-breadcrumb {
+  margin-bottom: 15px;
+  padding: 10px 0;
+  background-color: #fff;
+  border-radius: 4px;
+  padding-left: 15px;
 }
 </style> 

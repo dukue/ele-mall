@@ -42,22 +42,36 @@ const routes = [
         component: () => import('../views/StatisticsPage.vue')
       },
       {
-        path: 'language',
-        name: 'Language',
-        component: () => import('@/views/language/LanguageList.vue'),
-        meta: { title: '语言管理' }
+        path: '/home/languages',
+        name: 'Languages',
+        component: () => import('@/views/i18n/LanguageList.vue'),
+        meta: { 
+          title: 'menu.i18n.languages',
+          icon: 'Language'
+        }
       },
       {
-        path: 'exchange',
-        name: 'Exchange',
-        component: () => import('@/views/exchange/ExchangeRate.vue'),
-        meta: { title: '汇率管理' }
+        path: '/home/exchange',
+        component: () => import('@/views/exchange/ExchangeList.vue'),
+        name: 'ExchangeRates',
+        meta: { title: 'exchangeRates' }
       },
       {
         path: 'warehouse',
         name: 'Warehouse',
         component: () => import('@/views/warehouse/WarehouseList.vue'),
         meta: { title: '仓库管理' }
+      },
+      {
+        path: '/categories',
+        name: 'Categories',
+        component: () => import('../views/products/CategoryList.vue')
+      },
+      {
+        path: '/customs',
+        name: 'Customs',
+        component: () => import('../views/customs/CustomsList.vue'),
+        meta: { title: '清关管理' }
       }
     ]
   }

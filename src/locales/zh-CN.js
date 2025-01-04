@@ -14,7 +14,14 @@ export default {
     systemTitle: '电商后台管理系统',
     logout: '退出登录',
     home: '首页',
-    welcome: '欢迎页面'
+    welcome: '欢迎页面',
+    view: '查看',
+    process: '处理',
+    selectFile: '选择文件',
+    file: '文件',
+    download: '下载',
+    yes: '是',
+    no: '否'
   },
   product: {
     list: '商品列表',
@@ -45,7 +52,8 @@ export default {
     atLeastOneName: '至少需要一种语言的商品名称',
     saveFailed: '保存失败',
     updateFailed: '更新失败',
-    addFailed: '添加失败'
+    addFailed: '添加失败',
+    unknownCategory: '未知分类'
   },
   validation: {
     required: '{field}不能为空',
@@ -55,13 +63,28 @@ export default {
   menu: {
     home: '首页',
     welcome: '欢迎页面',
+    crossBorder: {
+      title: '跨境管理'
+    },
+    i18n: {
+      title: '语言管理',
+      languages: '语言列表'
+    },
+    exchange: {
+      title: '汇率管理'
+    },
+    warehouse: {
+      title: '仓库管理'
+    },
     products: {
       title: '商品管理',
-      list: '商品列表'
+      list: '商品列表',
+      categories: '分类管理'
     },
     orders: {
       title: '订单管理',
-      list: '订单列表'
+      list: '订单列表',
+      customs: '清关管理'
     },
     users: {
       title: '用户管理',
@@ -75,7 +98,6 @@ export default {
   category: {
     list: '分类列表',
     name: '分类名称',
-    description: '分类描述',
     productCount: '商品数量',
     addCategory: '添加分类',
     editCategory: '编辑分类',
@@ -84,6 +106,185 @@ export default {
     addSuccess: '添加分类成功',
     editSuccess: '编辑分类成功',
     deleteSuccess: '删除分类成功',
-    getFailed: '获取分类列表失败'
+    addFailed: '添加分类失败',
+    editFailed: '编辑分类失败',
+    deleteFailed: '删除分类失败',
+    getFailed: '获取分类列表失败',
+    nameLengthTip: '分类名称长度在 2 到 20 个字符',
+    atLeastOneName: '至少需要一种语言的分类名称',
+    description: '分类描述'
+  },
+  order: {
+    orderNo: '订单编号',
+    customer: '客户',
+    amount: '订单金额',
+    status: '订单状态',
+    createTime: '创建时间',
+    orderDetail: '订单详情',
+    process: '处理',
+    searchPlaceholder: '请输入订单编号',
+    statusFilter: '订单状态筛选',
+    listFailed: '获取订单列表失败',
+    processConfirm: '确定要处理该订单吗？',
+    processSuccess: '订单处理成功',
+    processFailed: '订单处理失败',
+    statusMap: {
+      pending: '待发货',
+      processing: '已发货',
+      completed: '已完成',
+      cancelled: '已取消'
+    },
+    basicInfo: '基本信息',
+    products: '商品信息',
+    unitPrice: '单价',
+    quantity: '数量',
+    subtotal: '小计',
+    shippingInfo: '收货信息',
+    recipient: '收货人',
+    phone: '联系电话',
+    address: '收货地址',
+    updateTime: '更新时间',
+    totalAmount: '订单总额',
+    payMethod: '支付方式',
+    payMethodMap: {
+      alipay: '支付宝',
+      wechat: '微信支付',
+      bank: '银行转账'
+    },
+    getDetailFailed: '获取订单详情失败',
+    updateStatusSuccess: '更新订单状态成功',
+    updateStatusFailed: '更新订单状态失败',
+    confirmUpdateStatus: '确定要将订单状态更新为{status}吗？',
+    tracking: {
+      title: '物流信息',
+      trackingNo: '物流单号',
+      carrier: '承运商',
+      status: '物流状态',
+      estimatedDelivery: '预计送达',
+      originCountry: '始发国',
+      destinationCountry: '目的国',
+      location: '当前位置',
+      details: '详细信息',
+      history: '物流历史',
+      eventTime: '时间',
+      createTracking: '创建物流',
+      updateStatus: '更新状态',
+      createSuccess: '创建物流信息成功',
+      createFailed: '创建物流信息失败',
+      updateSuccess: '更新物流状态成功',
+      updateFailed: '更新物流状态失败',
+      statusTypes: {
+        pending: '待发货',
+        in_transit: '运输中',
+        customs: '海关清关',
+        arrived: '已到达',
+        delivered: '已送达',
+        exception: '异常',
+        returned: '已退回'
+      }
+    }
+  },
+  user: {
+    username: '用户名',
+    password: '密码',
+    email: '邮箱',
+    mobile: '手机号',
+    role: '角色',
+    status: '状态',
+    createTime: '创建时间',
+    searchPlaceholder: '请输入用户名/邮箱/手机号',
+    addUser: '添加用户',
+    editUser: '编辑用户',
+    deleteConfirm: '确定要删除该用户吗？',
+    addSuccess: '添加用户成功',
+    editSuccess: '编辑用户成功',
+    deleteSuccess: '删除用户成功',
+    listFailed: '获取用户列表失败',
+    addFailed: '添加用户失败',
+    editFailed: '编辑用户失败',
+    deleteFailed: '删除用户失败',
+    usernameLengthTip: '用户名长度在 3 到 20 个字符',
+    passwordLengthTip: '密码长度不能小于 6 个字符',
+    emailFormatTip: '请输入正确的邮箱地址',
+    mobileFormatTip: '请输入正确的手机号',
+    roleMap: {
+      admin: '管理员',
+      user: '普通用户'
+    },
+    statusUpdateSuccess: '用户状态更新成功',
+    statusUpdateFailed: '用户状态更新失败'
+  },
+  customs: {
+    searchPlaceholder: '请输入订单编号',
+    statusFilter: '清关状态筛选',
+    listFailed: '获取清关列表失败',
+    status: '清关状态',
+    declarationNo: '报关单号',
+    customsOffice: '海关机构',
+    inspectionNotes: '查验记录',
+    documents: '清关文件',
+    updateStatus: '更新状态',
+    uploadDocument: '上传文件',
+    documentType: '文件类型',
+    documentName: '文件名称',
+    updateSuccess: '状态更新成功',
+    updateFailed: '状态更新失败',
+    uploadSuccess: '文件上传成功',
+    uploadFailed: '文件上传失败',
+    downloadFailed: '文件下载失败',
+    statusTypes: {
+      pending: '待清关',
+      submitted: '已提交',
+      inspecting: '查验中',
+      approved: '已放行',
+      rejected: '已拒绝',
+      completed: '已完成'
+    },
+    documentTypes: {
+      invoice: '商业发票',
+      packing_list: '装箱单',
+      declaration: '报关单',
+      inspection_cert: '查验证书',
+      other: '其他文件'
+    },
+    uploadTip: '支持 PDF、Word、JPG、PNG 格式文件，文件大小不超过 10MB',
+    invalidFileType: '不支持的文件类型',
+    fileSizeLimit: '文件大小不能超过 10MB',
+    uploadComplete: '上传完成'
+  },
+  language: {
+    code: '语言代码',
+    name: '语言名称',
+    isDefault: '默认语言',
+    isActive: '是否启用',
+    addLanguage: '添加语言',
+    editLanguage: '编辑语言',
+    deleteLanguage: '删除语言',
+    deleteConfirm: '确定要删除该语言吗？',
+    addSuccess: '添加语言成功',
+    editSuccess: '编辑语言成功',
+    deleteSuccess: '删除语言成功',
+    addFailed: '添加语言失败',
+    editFailed: '编辑语言失败',
+    deleteFailed: '删除语言失败',
+    getFailed: '获取语言列表失败',
+    statusUpdateSuccess: '语言状态更新成功',
+    statusUpdateFailed: '语言状态更新失败',
+    codeFormatTip: '语言代码格式为：xx 或 xx-XX，如：zh、en-US'
+  },
+  exchange: {
+    addRate: '添加汇率',
+    editRate: '编辑汇率',
+    fromCurrency: '原币种',
+    toCurrency: '目标币种',
+    rate: '汇率',
+    isActive: '是否启用',
+    getFailed: '获取汇率列表失败',
+    addSuccess: '添加汇率成功',
+    addFailed: '添加汇率失败',
+    editSuccess: '编辑汇率成功',
+    editFailed: '编辑汇率失败',
+    statusUpdateSuccess: '更新状态成功',
+    statusUpdateFailed: '更新状态失败'
   }
 } 
