@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import InventoryManagement from '@/views/warehouse/InventoryManagement.vue'
+import LayoutContainer from '@/layout'
 
 const routes = [
   {
@@ -13,36 +15,41 @@ const routes = [
   {
     path: '/home',
     name: 'Home',
-    component: () => import('../views/HomePage.vue'),
+    component: LayoutContainer,
     redirect: '/welcome',
     children: [
       {
         path: '/welcome',
         name: 'Welcome',
-        component: () => import('../views/WelcomePage.vue')
+        component: () => import('../views/WelcomePage.vue'),
+        meta: { title: 'menu.welcome' }
       },
       {
         path: '/products',
-        name: 'Products',
-        component: () => import('../views/products/ProductList.vue')
+        name: 'ProductList',
+        component: () => import('@/views/products/ProductList.vue'),
+        meta: { title: 'menu.products.list' }
       },
       {
         path: '/orders',
         name: 'Orders',
-        component: () => import('../views/orders/OrderList.vue')
+        component: () => import('../views/orders/OrderList.vue'),
+        meta: { title: 'menu.orders.list' }
       },
       {
         path: '/users',
         name: 'Users',
-        component: () => import('../views/users/UserList.vue')
+        component: () => import('../views/users/UserList.vue'),
+        meta: { title: 'menu.users.list' }
       },
       {
         path: '/statistics',
         name: 'Statistics',
-        component: () => import('../views/StatisticsPage.vue')
+        component: () => import('../views/StatisticsPage.vue'),
+        meta: { title: 'menu.statistics.report' }
       },
       {
-        path: '/home/languages',
+        path: '/languages',
         name: 'Languages',
         component: () => import('@/views/i18n/LanguageList.vue'),
         meta: { 
@@ -51,27 +58,42 @@ const routes = [
         }
       },
       {
-        path: '/home/exchange',
-        component: () => import('@/views/exchange/ExchangeList.vue'),
+        path: '/exchange',
         name: 'ExchangeRates',
-        meta: { title: 'exchangeRates' }
+        component: () => import('@/views/exchange/ExchangeList.vue'),
+        meta: { title: 'menu.exchange.title' }
       },
       {
-        path: 'warehouse',
-        name: 'Warehouse',
+        path: '/products/:id',
+        name: 'ProductDetail',
+        component: () => import('@/views/products/ProductDetail.vue'),
+        meta: { title: 'product.detail' },
+        children: [
+          {
+            path: 'inventory',
+            name: 'ProductInventory',
+            component: InventoryManagement,
+            meta: { title: 'inventory.title' }
+          }
+        ]
+      },
+      {
+        path: '/warehouse',
+        name: 'WarehouseList',
         component: () => import('@/views/warehouse/WarehouseList.vue'),
-        meta: { title: '仓库管理' }
+        meta: { title: 'menu.warehouse.title' }
       },
       {
         path: '/categories',
         name: 'Categories',
-        component: () => import('../views/products/CategoryList.vue')
+        component: () => import('../views/products/CategoryList.vue'),
+        meta: { title: 'menu.products.categories' }
       },
       {
         path: '/customs',
         name: 'Customs',
         component: () => import('../views/customs/CustomsList.vue'),
-        meta: { title: '清关管理' }
+        meta: { title: 'menu.orders.customs' }
       }
     ]
   }

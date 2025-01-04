@@ -286,5 +286,42 @@ export default {
     editFailed: '编辑汇率失败',
     statusUpdateSuccess: '更新状态成功',
     statusUpdateFailed: '更新状态失败'
+  },
+  warehouse: {
+    title: '仓库管理',
+    code: '仓库编码',
+    name: '仓库名称',
+    location: '位置',
+    country: '国家',
+    contact: '联系人',
+    phone: '联系电话',
+    status: '状态',
+    active: '正常',
+    inactive: '维护中',
+    add: '添加仓库',
+    edit: '编辑仓库',
+    deleteConfirm: '确定要删除仓库 "{name}" 吗？',
+    addSuccess: '添加仓库成功',
+    editSuccess: '编辑仓库成功',
+    deleteSuccess: '删除仓库成功',
+    listFailed: '获取仓库列表失败',
+    addFailed: '添加仓库失败',
+    updateFailed: '更新仓库失败',
+    deleteFailed: '删除仓库失败'
+  },
+  inventory: {
+    title: '商品库存',
+    transfer: '调拨',
+    transferTitle: '库存调拨',
+    fromWarehouse: '调出仓库',
+    toWarehouse: '调入仓库',
+    quantity: '调拨数量',
+    reason: '调拨原因',
+    outOfStock: '无可用库存',
+    lowStock: '库存不足',
+    sufficient: '库存充足',
+    getFailed: '获取库存信息失败',
+    transferSuccess: '库存调拨成功',
+    transferFailed: '库存调拨失败'
   }
 } 
