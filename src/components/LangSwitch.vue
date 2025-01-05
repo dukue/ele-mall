@@ -95,7 +95,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   cursor: pointer;
-  color: #fff;
+  color: #000000;
 }
 
 .el-icon {
