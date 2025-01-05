@@ -45,7 +45,7 @@ const routes = [
       {
         path: '/statistics',
         name: 'Statistics',
-        component: () => import('../views/StatisticsPage.vue'),
+        component: () => import('../views/statistics/StatisticsPage.vue'),
         meta: { title: 'menu.statistics.report' }
       },
       {
@@ -90,10 +90,9 @@ const routes = [
         meta: { title: 'menu.products.categories' }
       },
       {
-        path: '/customs',
-        name: 'Customs',
-        component: () => import('../views/customs/CustomsList.vue'),
-        meta: { title: 'menu.orders.customs' }
+        path: '/products/add',
+        name: 'AddProduct',
+        component: () => import('@/views/products/AddProduct.vue')
       }
     ]
   }

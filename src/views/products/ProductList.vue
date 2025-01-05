@@ -5,7 +5,8 @@
         <div class="card-header">
           <span>{{ t('product.list') }}</span>
           <el-button type="primary" @click="handleAdd">
-            {{ t('common.add') }}
+            <el-icon><Plus /></el-icon>
+            {{ t('product.addProduct') }}
           </el-button>
         </div>
       </template>
@@ -109,6 +110,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import request from '@/utils/request'
+import { Plus } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -225,7 +227,7 @@ const handleDelete = (row) => {
 
 // 添加商品
 const handleAdd = () => {
-  router.push({ name: 'ProductDetail' })
+  router.push('/products/add')
 }
 
 onMounted(() => {

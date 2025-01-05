@@ -1,5 +1,5 @@
 <template>
-  <el-main>
+  <el-main class="app-main">
     <!-- 面包屑导航 -->
     <el-breadcrumb separator="/">
       <el-breadcrumb-item :to="{ path: '/welcome' }">{{ $t('common.home') }}</el-breadcrumb-item>
@@ -36,18 +36,13 @@ const currentSubMenu = computed(() => {
 </script>
 
 <style scoped>
-.el-main {
-  background-color: #eaedf1;
+.app-main {
   padding: 20px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-}
-
-.el-main > :last-child {
-  flex: 1;
-  overflow-y: auto;
-  margin-top: 20px;
+  height: 100vh;
+  box-sizing: border-box;
 }
 
 .el-breadcrumb {
@@ -56,5 +51,12 @@ const currentSubMenu = computed(() => {
   background-color: #fff;
   border-radius: 4px;
   padding-left: 15px;
+  flex-shrink: 0;
+}
+
+.app-main :deep(.el-main) {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
 }
 </style> 

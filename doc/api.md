@@ -221,7 +221,7 @@ PUT /auth/users/3/status
 > Body 请求参数
 
 ```
-"{\r\n  \"status\": false\r\n}"
+"{\r\n  \"status\": true\r\n}"
 
 ```
 
@@ -229,7 +229,9 @@ PUT /auth/users/3/status
 
 |名称|位置|类型|必选|说明|
 |---|---|---|---|---|
+|status|query|boolean| 否 |none|
 |Authorization|header|string| 否 |none|
+|Content-Type|header|string| 否 |none|
 |body|body|string| 否 |none|
 
 > 返回示例
@@ -271,6 +273,7 @@ GET /products
 |pagenum|query|string| 否 |none|
 |pagesize|query|string| 否 |none|
 |query|query|string| 否 |none|
+|lang|query|string| 否 |none|
 |Authorization|header|string| 否 |none|
 
 > 返回示例
@@ -341,11 +344,31 @@ POST /products
 
 \      }\r
 
-\    }\r
+\    },\r
+
+\         \"en\": {\r
+
+\        \"name\": \"Wireless Mouse\",\r
+
+\        \"description\": \"Ergonomic wireless mouse...\",\r
+
+\        \"specifications\": {}\r
+
+\      },\r
+
+\      \"ja\": {\r
+
+\        \"name\": \"ワイヤレスマウス\",\r
+
+\        \"description\": \"人間工学に基づいた...\",\r
+
+\        \"specifications\": {}\r
+
+\      }\r
 
 \  }\r
 
-}"
+}\r\n"
 
 ```
 
@@ -409,13 +432,33 @@ PUT /products/1
 ```
 "{\r
 
-\  \"name\": \"更新的商品\",\r
-
 \  \"price\": 199.99,\r
 
 \  \"weight\": 2.5,\r
 
-\  \"description\": \"更新后的商品描述\"\r
+\  \"status\": true,\r
+
+\  \"categoryId\": 1,\r
+
+\  \"translations\": {\r
+
+\    \"zh\": {\r
+
+\      \"name\": \"更新的商品名\",\r
+
+\      \"description\": \"更新的商品描述\"\r
+
+\    },\r
+
+\    \"en\": {\r
+
+\      \"name\": \"Updated Product Name\",\r
+
+\      \"description\": \"Updated product description\"\r
+
+\    }\r
+
+\  }\r
 
 }"
 
@@ -509,6 +552,155 @@ DELETE /products/1
 |---|---|---|---|---|---|
 |» code|integer|true|none||none|
 |» message|string|true|none||none|
+
+## GET 查询商品信息
+
+GET /products/1
+
+### 请求参数
+
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|Authorization|header|string| 否 |none|
+
+> 返回示例
+
+> 200 Response
+
+```json
+{
+  "code": 0,
+  "message": "string",
+  "data": {
+    "id": 0,
+    "price": "string",
+    "weight": "string",
+    "status": true,
+    "category": {
+      "id": 0,
+      "translations": {
+        "zh": {
+          "name": null,
+          "description": null
+        },
+        "en": {
+          "name": null,
+          "description": null
+        },
+        "ja": {
+          "name": null,
+          "description": null
+        }
+      }
+    },
+    "translations": {
+      "zh": {
+        "name": "string",
+        "description": "string",
+        "specifications": {
+          "size": null,
+          "color": null,
+          "material": null
+        },
+        "seoTitle": null,
+        "seoDescription": null,
+        "seoKeywords": null
+      },
+      "en": {
+        "name": "string",
+        "description": "string",
+        "specifications": {
+          "size": null,
+          "color": null,
+          "material": null
+        },
+        "seoTitle": null,
+        "seoDescription": null,
+        "seoKeywords": null
+      },
+      "ja": {
+        "name": "string",
+        "description": "string",
+        "specifications": {
+          "size": null,
+          "color": null,
+          "material": null
+        },
+        "seoTitle": null,
+        "seoDescription": null,
+        "seoKeywords": null
+      }
+    },
+    "createTime": "string",
+    "updateTime": "string"
+  }
+}
+```
+
+### 返回结果
+
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|Inline|
+
+### 返回数据结构
+
+状态码 **200**
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|» code|integer|true|none||none|
+|» message|string|true|none||none|
+|» data|object|true|none||none|
+|»» id|integer|true|none||none|
+|»» price|string|true|none||none|
+|»» weight|string|true|none||none|
+|»» status|boolean|true|none||none|
+|»» category|object|true|none||none|
+|»»» id|integer|true|none||none|
+|»»» translations|object|true|none||none|
+|»»»» zh|object|true|none||none|
+|»»»»» name|string|true|none||none|
+|»»»»» description|string|true|none||none|
+|»»»» en|object|true|none||none|
+|»»»»» name|string|true|none||none|
+|»»»»» description|string|true|none||none|
+|»»»» ja|object|true|none||none|
+|»»»»» name|string|true|none||none|
+|»»»»» description|string|true|none||none|
+|»» translations|object|true|none||none|
+|»»» zh|object|true|none||none|
+|»»»» name|string|true|none||none|
+|»»»» description|string|true|none||none|
+|»»»» specifications|object|true|none||none|
+|»»»»» size|string|true|none||none|
+|»»»»» color|string|true|none||none|
+|»»»»» material|string|true|none||none|
+|»»»» seoTitle|null|true|none||none|
+|»»»» seoDescription|null|true|none||none|
+|»»»» seoKeywords|null|true|none||none|
+|»»» en|object|true|none||none|
+|»»»» name|string|true|none||none|
+|»»»» description|string|true|none||none|
+|»»»» specifications|object|true|none||none|
+|»»»»» size|string|true|none||none|
+|»»»»» color|string|true|none||none|
+|»»»»» material|string|true|none||none|
+|»»»» seoTitle|null|true|none||none|
+|»»»» seoDescription|null|true|none||none|
+|»»»» seoKeywords|null|true|none||none|
+|»»» ja|object|true|none||none|
+|»»»» name|string|true|none||none|
+|»»»» description|string|true|none||none|
+|»»»» specifications|object|true|none||none|
+|»»»»» size|string|true|none||none|
+|»»»»» color|string|true|none||none|
+|»»»»» material|string|true|none||none|
+|»»»» seoTitle|null|true|none||none|
+|»»»» seoDescription|null|true|none||none|
+|»»»» seoKeywords|null|true|none||none|
+|»» createTime|string|true|none||none|
+|»» updateTime|string|true|none||none|
 
 ## PUT 更新商品状态
 
@@ -811,11 +1003,20 @@ DELETE /products/1/translations/fr
 
 GET /categories
 
+> Body 请求参数
+
+```
+string
+
+```
+
 ### 请求参数
 
 |名称|位置|类型|必选|说明|
 |---|---|---|---|---|
+|lang|query|string| 否 |none|
 |Authorization|header|string| 否 |none|
+|body|body|string| 否 |none|
 
 > 返回示例
 
@@ -865,7 +1066,29 @@ POST /categories
 > Body 请求参数
 
 ```
-"{\r\n  \"name\": \"生活用品\"\r\n}\r\n"
+"{\r
+
+\  \"translations\": {\r
+
+\    \"zh\": {\r
+
+\      \"name\": \"玩具\",\r
+
+\      \"description\": \"玩具分类\"\r
+
+\    },\r
+
+\    \"en\": {\r
+
+\      \"name\": \"Toys\",\r
+
+\      \"description\": \"Toys category\"\r
+
+\    }\r
+
+\  }\r
+
+}"
 
 ```
 
@@ -921,7 +1144,29 @@ PUT /categories/1
 > Body 请求参数
 
 ```
-"{\r\n  \"name\": \"数码产品\"\r\n}"
+"{\r
+
+\  \"translations\": {\r
+
+\    \"zh\": {\r
+
+\      \"name\": \"数码产品\",\r
+
+\      \"description\": \"数码产品分类\"\r
+
+\    },\r
+
+\    \"en\": {\r
+
+\      \"name\": \"Digital Products\",\r
+
+\      \"description\": \"Digital products category\"\r
+
+\    }\r
+
+\  }\r
+
+}"
 
 ```
 
@@ -1021,6 +1266,7 @@ GET /orders
 |startDate|query|string| 否 |none|
 |endDate|query|string| 否 |none|
 |query|query|string| 否 |none|
+|status|query|string| 否 |none|
 |Authorization|header|string| 否 |none|
 
 > 返回示例
@@ -1226,11 +1472,19 @@ GET /orders/1
 
 GET /orders/1/customs
 
+> Body 请求参数
+
+```
+string
+
+```
+
 ### 请求参数
 
 |名称|位置|类型|必选|说明|
 |---|---|---|---|---|
 |Authorization|header|string| 否 |none|
+|body|body|string| 否 |none|
 
 > 返回示例
 
@@ -1610,14 +1864,14 @@ POST /orders/1/tracking
 
 ## PUT 更新物流状态
 
-PUT /orders/1/tracking/TN17346182182642
+PUT /orders/1/tracking/TN1735840566070882
 
 > Body 请求参数
 
 ```
 "{\r
 
-\  \"status\": \"arrived\",\r
+\  \"status\": \"in_transit\",\r
 
 \  \"location\": \"Los Angeles International Airport\",\r
 
@@ -2382,16 +2636,16 @@ POST /i18n/languages
 
 ## PUT 更新语言
 
-PUT /i18n/languages/4
+PUT /i18n/languages/1
 
 > Body 请求参数
 
 ```
 "{\r
 
-\  \"name\": \"French\",\r
+\  \"name\": \"中文\",\r
 
-\  \"isDefault\": false\r
+\  \"isDefault\": true\r
 
 }"
 
@@ -2564,7 +2818,7 @@ PUT /exchange/rates/1
 > Body 请求参数
 
 ```
-"{\r\n  \"rate\": 6.45\r\n}"
+"{\r\n  \"rate\": 6.33\r\n}"
 
 ```
 

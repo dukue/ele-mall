@@ -67,12 +67,6 @@ export const menuList = [
         path: '/orders',
         langKey: 'menu.orders.list'
       },
-      {
-        id: 32,
-        authName: 'menu.orders.customs',
-        path: '/customs',
-        langKey: 'menu.orders.customs'
-      }
     ]
   },
   {

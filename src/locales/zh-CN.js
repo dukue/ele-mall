@@ -21,7 +21,11 @@ export default {
     file: '文件',
     download: '下载',
     yes: '是',
-    no: '否'
+    no: '否',
+    startDate: '开始日期',
+    endDate: '结束日期',
+    createTime: '创建时间',
+    updateTime: '更新时间'
   },
   product: {
     list: '商品列表',
@@ -36,7 +40,6 @@ export default {
     editProduct: '编辑商品',
     deleteConfirm: '确定要删除该商品吗？',
     addSuccess: '添加商品成功',
-    editSuccess: '修改商品成功',
     deleteSuccess: '删除商品成功',
     searchPlaceholder: '请输入商品名称',
     deleteFailed: '删除商品失败',
@@ -53,7 +56,11 @@ export default {
     saveFailed: '保存失败',
     updateFailed: '更新失败',
     addFailed: '添加失败',
-    unknownCategory: '未知分类'
+    unknownCategory: '未知分类',
+    inventory: '库存管理',
+    getDetailFailed: '获取商品详情失败',
+    editSuccess: '编辑商品成功',
+    editFailed: '编辑商品失败'
   },
   validation: {
     required: '{field}不能为空',
@@ -182,7 +189,9 @@ export default {
         exception: '异常',
         returned: '已退回'
       }
-    }
+    },
+    orderCount: '订单数',
+    amountCNY: '人民币金额'
   },
   user: {
     username: '用户名',
@@ -285,7 +294,8 @@ export default {
     editSuccess: '编辑汇率成功',
     editFailed: '编辑汇率失败',
     statusUpdateSuccess: '更新状态成功',
-    statusUpdateFailed: '更新状态失败'
+    statusUpdateFailed: '更新状态失败',
+    currency: '币种'
   },
   warehouse: {
     title: '仓库管理',
@@ -310,7 +320,7 @@ export default {
     deleteFailed: '删除仓库失败'
   },
   inventory: {
-    title: '商品库存',
+    title: '库存管理',
     transfer: '调拨',
     transferTitle: '库存调拨',
     fromWarehouse: '调出仓库',
@@ -322,6 +332,50 @@ export default {
     sufficient: '库存充足',
     getFailed: '获取库存信息失败',
     transferSuccess: '库存调拨成功',
-    transferFailed: '库存调拨失败'
+    transferFailed: '库存调拨失败',
+    add: '添加库存',
+    selectWarehouse: '选择仓库',
+    safetyStock: '安全库存',
+    invalidData: '请检查库存数据是否正确',
+    noData: '暂无库存数据，点击下方按钮添加'
+  },
+  statistics: {
+    overview: '数据概览',
+    totalSales: '总销售额',
+    totalOrders: '总订单数',
+    totalProducts: '商品总数',
+    totalUsers: '用户总数',
+    salesTrend: '销售趋势',
+    categoryDistribution: '分类分布',
+    paymentMethods: '支付方式分布',
+    week: '本周',
+    month: '本月',
+    year: '本年',
+    getDataFailed: '获取数据失败',
+    logistics: {
+      title: '物流数据',
+      cost: '物流成本',
+      time: '物流时效',
+      performance: '承运商绩效',
+      shipmentCount: '运单数',
+      avgCost: '平均成本',
+      totalShipments: '总运单数',
+      deliveryRate: '送达率',
+      exceptionRate: '异常率',
+      returnRate: '退回率'
+    },
+    international: {
+      title: '国际销售',
+      domestic: '国内销售',
+      overseas: '海外销售',
+      byCountry: '各国销售',
+      byCurrency: '各币种销售'
+    },
+    noData: '暂无数据',
+    orderCount: '订单数',
+    amount: '金额',
+    amountCNY: '人民币金额',
+    productCount: '商品数量',
+    percentage: '占比'
   }
 } 

@@ -21,7 +21,9 @@ export default {
     file: 'File',
     download: 'Download',
     yes: 'Yes',
-    no: 'No'
+    no: 'No',
+    createTime: 'Create Time',
+    updateTime: 'Update Time'
   },
   product: {
     list: 'Product List',
@@ -285,5 +287,44 @@ export default {
     editFailed: 'Failed to update rate',
     statusUpdateSuccess: 'Status updated successfully',
     statusUpdateFailed: 'Failed to update status'
+  },
+  statistics: {
+    overview: 'Overview',
+    totalSales: 'Total Sales',
+    totalOrders: 'Total Orders',
+    totalProducts: 'Total Products',
+    totalUsers: 'Total Users',
+    salesTrend: 'Sales Trend',
+    categoryDistribution: 'Category Distribution',
+    paymentMethods: 'Payment Methods',
+    week: 'Week',
+    month: 'Month',
+    year: 'Year',
+    getDataFailed: 'Failed to get data',
+    logistics: {
+      title: 'Logistics Data',
+      cost: 'Logistics Cost',
+      time: 'Delivery Time',
+      performance: 'Carrier Performance',
+      shipmentCount: 'Shipment Count',
+      avgCost: 'Average Cost',
+      totalShipments: 'Total Shipments',
+      deliveryRate: 'Delivery Rate',
+      exceptionRate: 'Exception Rate',
+      returnRate: 'Return Rate'
+    },
+    international: {
+      title: 'International Sales',
+      domestic: 'Domestic Sales',
+      overseas: 'Overseas Sales',
+      byCountry: 'Sales by Country',
+      byCurrency: 'Sales by Currency'
+    },
+    noData: 'No Data',
+    orderCount: 'Order Count',
+    amount: 'Amount',
+    amountCNY: 'Amount (CNY)',
+    productCount: 'Product Count',
+    percentage: 'Percentage'
   }
 } 
