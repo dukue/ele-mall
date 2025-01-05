@@ -143,7 +143,7 @@ npm run build
 
 #### 仓库管理
 
-![仓库管理](./docs/images/wearhouse.png)
+![仓库管理](./docs/images/warehouse.png)
 
 ## 国际化支持
 
