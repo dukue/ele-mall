@@ -139,11 +139,11 @@ npm run build
 
 #### 汇率管理
 
-![语言管理](./docs/images/exchange.png)
+![汇率管理](./docs/images/exchange.png)
 
 #### 仓库管理
 
-![语言管理](./docs/images/wearhouse.png)
+![仓库管理](./docs/images/wearhouse.png)
 
 ## 国际化支持
 
