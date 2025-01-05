@@ -64,6 +64,22 @@ src/
 
 ```
 
+## 项目结构
+
+src/
+├── assets/          # 静态资源
+├── components/      # 公共组件
+├── config/          # 配置文件
+├── locales/         # 国际化语言包
+├── plugins/         # 插件配置
+├── router/          # 路由配置
+├── utils/          # 工具函数
+└── views/          # 页面组件
+    ├── products/   # 商品相关
+    ├── orders/     # 订单相关
+    ├── warehouse/  # 仓库相关
+    └── ...
+
 ## 开发环境要求
 
 - Node.js >= 14.0.0
@@ -72,11 +88,13 @@ src/
 ## 安装和运行
 
 1. 安装依赖
+
 ```bash
 npm install
 ```
 
-2. 开发环境运行
+2.开发环境运行
+
 ```bash
 npm run serve
 ```
