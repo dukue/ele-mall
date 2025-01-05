@@ -25,5 +25,10 @@ defineComponent({
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background-color: #f5f7fa;
+}
+
+:deep(.el-container) {
+  height: calc(100vh - 60px);
 }
 </style> 

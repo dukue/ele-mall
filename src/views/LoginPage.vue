@@ -1,5 +1,6 @@
 <template>
-  <div class="login-container">
+  <div class="login-container" :style="{ backgroundImage: `url(${bgImage})` }">
+    <h1 class="system-title">电商后台管理系统</h1>
     <div class="login-box">
       <!-- 头像区域 -->
       <div class="avatar-box">
@@ -35,6 +36,7 @@
           <el-button type="primary" @click="login" :loading="loading">登录</el-button>
           <el-button type="info" @click="resetLoginForm">重置</el-button>
         </el-form-item>
+        <div class="copyright">&copy; 2024-2025 dukue</div>
       </el-form>
     </div>
   </div>
@@ -49,6 +51,9 @@ import request from '@/utils/request'
 const router = useRouter()
 const loginFormRef = ref()
 const loading = ref(false)
+const bgImage = ref('https://api.vvhan.com/api/bing?rand=sj')
+
+
 
 // 登录表单的数据绑定对象
 const loginForm = ref({
@@ -100,55 +105,122 @@ const login = () => {
     }
   })
 }
+
 </script>
 
 <style scoped>
+.system-title {
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
+  font-size: 36px;
+  font-weight: 600;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  margin: 0;
+  z-index: 2;
+  letter-spacing: 2px;
+}
+
 .login-container {
   background-color: #2b4b6b;
   height: 100%;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(5px);
 }
 
 .login-box {
   width: 450px;
-  height: 300px;
-  background-color: #fff;
-  border-radius: 3px;
+  height: 400px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  overflow: visible;
 }
-
+.copyright {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #797171;
+  font-size: 12px;
+}
 .avatar-box {
-  height: 130px;
-  width: 130px;
-  border: 1px solid #eee;
+  height: 110px;
+  width: 110px;
+  border: 2px solid #9f9898;
   border-radius: 50%;
-  padding: 10px;
-  box-shadow: 0 0 10px #ddd;
+  padding: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   position: absolute;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #fff;
+  top: -10px;
+  background-color: #857f7f;
+  z-index: 1;
 }
 
 .avatar-box img {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background-color: #eee;
+  background-color: #fff;
 }
 
 .login-form {
-  position: absolute;
-  bottom: 0;
+  position: relative;
+  margin-top: 100px;
   width: 100%;
-  padding: 0 20px;
+  padding: 20px 40px;
   box-sizing: border-box;
 }
 
 .btns {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+  margin-top: 30px;
+  gap: 20px;
+}
+
+:deep(.el-input__wrapper) {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 44px;
+}
+
+:deep(.el-button) {
+  padding: 12px 36px;
+  border-radius: 4px;
+  font-weight: 500;
+  height: 44px;
+}
+
+:deep(.el-button--primary) {
+  background: linear-gradient(45deg, #409eff, #36a3f7);
+  border: none;
+}
+
+:deep(.el-button--info) {
+  background: #909399;
+  border: none;
 }
 </style> 

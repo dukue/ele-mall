@@ -23,7 +23,9 @@ export default {
     yes: 'はい',
     no: 'いいえ',
     createTime: '作成日時',
-    updateTime: '更新日時'
+    updateTime: '更新日時',
+    logoutSuccess: 'ログアウトしました',
+    logoutFailed: 'ログアウトに失敗しました'
   },
   product: {
     list: '商品一覧',

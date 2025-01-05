@@ -13,6 +13,8 @@ export default {
     loading: '加载中...',
     systemTitle: '电商后台管理系统',
     logout: '退出登录',
+    logoutSuccess: '退出成功',
+    logoutFailed: '退出失败',
     home: '首页',
     welcome: '欢迎页面',
     view: '查看',

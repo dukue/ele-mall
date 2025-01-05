@@ -6,9 +6,6 @@
     
     <el-menu
       :default-active="activePath"
-      background-color="#333744"
-      text-color="#fff"
-      active-text-color="#409EFF"
       :unique-opened="true"
       :collapse="isCollapse"
       :collapse-transition="false"
@@ -92,11 +89,14 @@ const getMenuTitle = computed(() => (authName) => t(authName))
 
 <style scoped>
 .el-aside {
-  background-color: #333744;
+  background-color: #ffffff;
   transition: width 0.3s;
   height: 100%;
   display: flex;
   flex-direction: column;
+  box-shadow: 1px 0 4px rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 999;
 }
 
 .el-menu {
@@ -106,12 +106,99 @@ const getMenuTitle = computed(() => (authName) => t(authName))
 }
 
 .toggle-button {
-  background-color: #4a5064;
-  font-size: 10px;
-  line-height: 24px;
-  color: #fff;
+  background-color: #f5f7fa;
+  font-size: 12px;
+  line-height: 32px;
+  color: #606266;
   text-align: center;
   letter-spacing: 0.2em;
   cursor: pointer;
+  border-bottom: 1px solid #e4e7ed;
+  transition: background-color 0.3s;
+}
+
+.toggle-button:hover {
+  background-color: #ecf5ff;
+  color: #409EFF;
+}
+
+:deep(.el-menu) {
+  --el-menu-bg-color: #ffffff;
+  --el-menu-text-color: #606266;
+  --el-menu-hover-bg-color: #ecf5ff;
+  --el-menu-active-color: #409EFF;
+}
+
+/* 一级菜单样式 */
+:deep(.el-sub-menu__title) {
+  height: 50px;
+  line-height: 50px;
+  padding: 0 20px !important;
+  font-size: 15px;
+  font-weight: 500;
+  color: #303133;
+  background-color: #ffffff;
+}
+
+/* 二级菜单容器 */
+:deep(.el-menu-item) {
+  height: 45px;
+  line-height: 45px;
+  padding: 0 20px 0 48px !important;
+  font-size: 14px;
+  background-color: #f9fafc;
+}
+
+:deep(.el-menu-item.is-active) {
+  background-color: #ecf5ff !important;
+  border-right: 2px solid #409EFF;
+}
+
+:deep(.el-sub-menu__title:hover) {
+  background-color: #ecf5ff;
+}
+
+:deep(.el-sub-menu) {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+:deep(.el-menu--collapse) {
+  width: 64px;
+}
+
+:deep(.el-menu-item:hover),
+:deep(.el-menu-item.is-active) {
+  color: #409EFF !important;
+}
+
+:deep(.el-icon) {
+  width: 24px;
+  text-align: center;
+  font-size: 18px;
+  margin-right: 5px;
+  color: #909399;
+}
+
+/* 一级菜单图标 */
+:deep(.el-sub-menu__title .el-icon) {
+  font-size: 18px;
+  color: #606266;
+}
+
+/* 二级菜单图标 */
+:deep(.el-menu-item .el-icon) {
+  font-size: 16px;
+  color: #909399;
+}
+
+:deep(.el-menu-item.is-active .el-icon),
+:deep(.el-menu-item:hover .el-icon),
+:deep(.el-sub-menu__title:hover .el-icon) {
+  color: #409EFF;
+}
+
+/* 展开的子菜单 */
+:deep(.el-sub-menu.is-opened) {
+  background-color: #f9fafc;
 }
 </style> 

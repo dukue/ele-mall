@@ -1,6 +1,7 @@
 <template>
   <el-header>
     <div class="header-left">
+      <img src="@/assets/logo.png" alt="logo" class="logo_img">
       <div class="logo">{{ $t('common.systemTitle') }}</div>
     </div>
     <div class="header-right">
@@ -36,7 +37,6 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { ArrowDown } from '@element-plus/icons-vue'
-import request from '@/utils/request'
 import LangSwitch from '@/components/LangSwitch.vue'
 
 const router = useRouter()
@@ -57,37 +57,57 @@ const username = computed(() => userInfo.value.username)
 
 const logout = async () => {
   try {
-    await request.post('/auth/logout')
+    // 清除 cookie
+    document.cookie.split(";").forEach(cookie => {
+      const eqPos = cookie.indexOf("=")
+      const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie
+      document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"
+    })
+    
+    // 清除 sessionStorage
     window.sessionStorage.clear()
+    
+    // 跳转到登录页
     router.push('/login')
-    ElMessage.success('退出成功')
+    ElMessage.success(t('common.logoutSuccess'))
   } catch (error) {
     console.error('退出失败:', error)
+    ElMessage.error(t('common.logoutFailed'))
   }
 }
 </script>
 
 <style scoped>
+.logo_img {
+  width: 50px;
+  height: 50px;
+  margin-right: 12px;
+}
+
 .el-header {
-  background-color: #373d41;
+  background-color: #ffffff;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #fff;
+  color: #333;
   font-size: 20px;
   padding: 0 20px;
   height: 60px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 1000;
 }
 
 .header-left {
   display: flex;
   align-items: center;
+  font-weight: 500;
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 20px;
 }
 
 .user-info {
@@ -95,5 +115,16 @@ const logout = async () => {
   align-items: center;
   gap: 8px;
   cursor: pointer;
+  font-size: 14px;
+  color: #606266;
+  transition: color 0.3s;
+}
+
+.user-info:hover {
+  color: #409EFF;
+}
+
+:deep(.el-dropdown-menu__item) {
+  padding: 8px 20px;
 }
 </style> 

@@ -37,26 +37,35 @@ const currentSubMenu = computed(() => {
 
 <style scoped>
 .app-main {
-  padding: 20px;
+  padding: 16px 24px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   height: 100vh;
   box-sizing: border-box;
+  background-color: #f5f7fa;
 }
 
 .el-breadcrumb {
   margin-bottom: 15px;
   padding: 10px 0;
   background-color: #fff;
-  border-radius: 4px;
+  border-radius: 8px;
   padding-left: 15px;
   flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .app-main :deep(.el-main) {
   flex: 1;
   overflow-y: auto;
   padding: 0;
+}
+
+:deep(.el-card) {
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  margin-bottom: 16px;
 }
 </style> 

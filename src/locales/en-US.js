@@ -13,6 +13,8 @@ export default {
     loading: 'Loading...',
     systemTitle: 'E-commerce Admin System',
     logout: 'Logout',
+    logoutSuccess: 'Logout successful',
+    logoutFailed: 'Logout failed',
     home: 'Home',
     welcome: 'Welcome',
     view: 'View',
