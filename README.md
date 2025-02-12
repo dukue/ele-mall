@@ -47,7 +47,7 @@
 - 物流数据
 
 ## 项目结构
-
+```
 src/
 ├── assets/          # 静态资源
 ├── components/      # 公共组件
@@ -70,6 +70,7 @@ src/
 ## 安装和运行
 
 1. 安装依赖
+
 ```bash
 npm install
 ```
@@ -138,11 +139,11 @@ npm run build
 
 #### 汇率管理
 
-![语言管理](./docs/images/exchange.png)
+![汇率管理](./docs/images/exchange.png)
 
 #### 仓库管理
 
-![语言管理](./docs/images/wearhouse.png)
+![仓库管理](./docs/images/warehouse.png)
 
 ## 国际化支持
 
