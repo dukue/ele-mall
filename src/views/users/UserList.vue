@@ -19,7 +19,11 @@
             </el-input>
           </el-col>
           <el-col :span="4">
-            <el-button type="primary" @click="handleAdd">
+            <el-button 
+              v-permission="'user.manage'"
+              type="primary" 
+              @click="handleAdd"
+            >
               <el-icon><Plus /></el-icon>
               {{ t('common.add') }}
             </el-button>
@@ -63,6 +67,7 @@
           <template #default="scope">
             <div class="operation-buttons">
               <el-button 
+                v-permission="'user.manage'"
                 type="primary" 
                 size="small"
                 @click="handleEdit(scope.row)"
@@ -71,6 +76,7 @@
                 {{ t('common.edit') }}
               </el-button>
               <el-button 
+                v-permission="'user.manage'"
                 type="danger" 
                 size="small"
                 :disabled="scope.row.role === 'admin'"

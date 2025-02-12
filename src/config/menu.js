@@ -73,6 +73,7 @@ export const menuList = [
     id: 4,
     authName: 'menu.users.title',
     path: '/users',
+    permission: 'user.manage',
     children: [
       {
         id: 41,

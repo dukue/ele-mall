@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import InventoryManagement from '@/views/warehouse/InventoryManagement.vue'
 import LayoutContainer from '@/layout'
+import { routePermissions, hasPermission } from '@/utils/permission'
+import { ElMessage } from 'element-plus'
 
 const routes = [
   {
@@ -106,8 +108,17 @@ const router = createRouter({
 // 导航守卫
 router.beforeEach((to, from, next) => {
   if (to.path === '/login') return next()
+  
   const token = window.sessionStorage.getItem('token')
   if (!token) return next('/login')
+  
+  // 检查路由权限
+  const requiredPermissions = routePermissions[to.path]
+  if (requiredPermissions && !requiredPermissions.some(permission => hasPermission(permission))) {
+    ElMessage.error('没有访问权限')
+    return next('/welcome')
+  }
+  
   next()
 })
 

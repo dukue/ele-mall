@@ -12,7 +12,11 @@
       router>
       
       <!-- 一级菜单 -->
-      <el-sub-menu :index="item.id + ''" v-for="item in menus" :key="item.id">
+      <el-sub-menu 
+        v-for="item in filteredMenus" 
+        :key="item.id"
+        :index="item.id + ''"
+      >
         <!-- 一级菜单模板 -->
         <template #title>
           <el-icon>
@@ -42,6 +46,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { House, Shop, User, Tickets, PieChart, Location, Fold, Expand } from '@element-plus/icons-vue'
 import { menuList, iconMap } from '@/config/menu'
+import { hasPermission } from '@/utils/permission'
 
 const { t } = useI18n()
 const isCollapse = ref(false)
@@ -85,6 +90,14 @@ const menus = ref(menuList)
 
 // 修改一级菜单的显示
 const getMenuTitle = computed(() => (authName) => t(authName))
+
+// 过滤后的菜单列表
+const filteredMenus = computed(() => {
+  return menus.value.filter(menu => {
+    // 如果没有权限要求或有对应权限则显示
+    return !menu.permission || hasPermission(menu.permission)
+  })
+})
 </script>
 
 <style scoped>

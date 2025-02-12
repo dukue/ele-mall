@@ -62,8 +62,6 @@ src/
     ├── warehouse/  # 仓库相关
     └── ...
 
-```
-
 ## 开发环境要求
 
 - Node.js >= 14.0.0
@@ -76,7 +74,8 @@ src/
 npm install
 ```
 
-2. 开发环境运行
+2.开发环境运行
+
 ```bash
 npm run serve
 ```
@@ -185,8 +184,8 @@ API 文档请参考 `doc/api.md`
 
 ## 联系方式
 
-- 作者：dukue
-- 邮箱：[2434918941a@gmail.com]
+- 作者：[cayden](https://github.com/dukue)
+- 邮箱：[2434918941a@gmail.com](mailto:2434918941a@gmail.com)
 
 ## 致谢
 
