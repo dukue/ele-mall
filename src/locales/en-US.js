@@ -57,7 +57,16 @@ export default {
     saveFailed: 'Save failed',
     updateFailed: 'Update failed',
     addFailed: 'Add failed',
-    unknownCategory: 'Unknown Category'
+    unknownCategory: 'Unknown Category',
+    mainImage: 'Main Image',
+    images: 'Product Images',
+    uploadMainImage: 'Upload Main Image',
+    uploadImages: 'Upload Images',
+    imageTypeError: 'Only JPG/PNG files are allowed',
+    imageSizeError: 'Image size cannot exceed 2MB',
+    uploadSuccess: 'Upload successful',
+    uploadFailed: 'Upload failed',
+    updateMainImage: "Updata Image"
   },
   validation: {
     required: '{field} is required',
@@ -215,7 +224,13 @@ export default {
     deleteFailed: 'Failed to delete category',
     getFailed: 'Failed to get category list',
     nameLengthTip: 'Category name length should be between 2 and 20 characters',
-    atLeastOneName: 'At least one language name is required'
+    atLeastOneName: 'At least one language name is required',
+    image: 'Category Image',
+    uploadImage: 'Upload Image',
+    imageTypeError: 'Only JPG/PNG/GIF files are allowed',
+    imageSizeError: 'Image size cannot exceed 5MB',
+    uploadSuccess: 'Upload successful',
+    uploadFailed: 'Upload failed'
   },
   customs: {
     searchPlaceholder: 'Enter order number',

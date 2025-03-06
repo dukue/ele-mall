@@ -62,7 +62,16 @@ export default {
     inventory: '库存管理',
     getDetailFailed: '获取商品详情失败',
     editSuccess: '编辑商品成功',
-    editFailed: '编辑商品失败'
+    editFailed: '编辑商品失败',
+    mainImage: '商品主图',
+    images: '商品图片集',
+    uploadMainImage: '上传主图',
+    uploadImages: '上传图片',
+    imageTypeError: '只能上传 JPG/PNG 格式的图片',
+    imageSizeError: '图片大小不能超过 2MB',
+    uploadSuccess: '上传成功',
+    uploadFailed: '上传失败',
+    updateMainImage: "修改主图"
   },
   validation: {
     required: '{field}不能为空',
@@ -121,7 +130,13 @@ export default {
     getFailed: '获取分类列表失败',
     nameLengthTip: '分类名称长度在 2 到 20 个字符',
     atLeastOneName: '至少需要一种语言的分类名称',
-    description: '分类描述'
+    description: '分类描述',
+    image: '分类图片',
+    uploadImage: '上传图片',
+    imageTypeError: '只能上传 JPG/PNG/GIF 格式的图片',
+    imageSizeError: '图片大小不能超过 5MB',
+    uploadSuccess: '上传成功',
+    uploadFailed: '上传失败'
   },
   order: {
     orderNo: '订单编号',

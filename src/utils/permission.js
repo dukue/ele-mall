@@ -34,6 +34,8 @@ export const isAdmin = () => {
 export const routePermissions = {
   '/users': ['user.manage'],
   '/categories': ['category.manage'],
+  '/products': ['product.view', 'product.manage'],
   '/products/add': ['product.manage'],
+  '/products/:id': ['product.view', 'product.manage'],
   '/statistics': ['statistics.view']
 } 

@@ -5,6 +5,12 @@
       <div class="logo">{{ $t('common.systemTitle') }}</div>
     </div>
     <div class="header-right">
+      <router-link to="/shop" class="shop-link">
+        <el-button type="primary" plain>
+          <el-icon><Shop /></el-icon>
+          前台商城
+        </el-button>
+      </router-link>
       <LangSwitch />
       <el-dropdown>
         <span class="user-info">
@@ -36,7 +42,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
-import { ArrowDown } from '@element-plus/icons-vue'
+import { ArrowDown, Shop } from '@element-plus/icons-vue'
 import LangSwitch from '@/components/LangSwitch.vue'
 
 const router = useRouter()
@@ -126,5 +132,16 @@ const logout = async () => {
 
 :deep(.el-dropdown-menu__item) {
   padding: 8px 20px;
+}
+
+.shop-link {
+  text-decoration: none;
+  margin-right: 20px;
+}
+
+.shop-link .el-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 </style> 

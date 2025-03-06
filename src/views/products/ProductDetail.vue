@@ -44,6 +44,43 @@
               </el-select>
             </el-form-item>
 
+            <!-- 商品主图上传 -->
+            <el-form-item :label="t('product.mainImage')" prop="mainImage">
+              <el-upload
+                class="product-image-upload"
+                :action="`${request.defaults.baseURL}/api/v1/products/${route.params.id}/image`"
+                :headers="uploadHeaders"
+                :show-file-list="false"
+                :before-upload="beforeImageUpload"
+                :on-success="handleMainImageSuccess"
+                :on-error="handleUploadError"
+                accept="image/jpeg,image/png,image/jpg"
+              >
+                <img v-if="productForm.mainImage" :src="productForm.mainImage" class="uploaded-image">
+                <el-icon v-else class="upload-icon"><Plus /></el-icon>
+                <div class="upload-text">{{ t('product.updateMainImage') }}</div>
+              </el-upload>
+            </el-form-item>
+
+            <!-- 商品图片集上传 -->
+            <el-form-item :label="t('product.images')" prop="images">
+              <el-upload
+                class="product-images-upload"
+                :action="`${request.defaults.baseURL}/api/v1/products/${route.params.id}/images`"
+                :headers="uploadHeaders"
+                :on-success="handleImagesSuccess"
+                :on-error="handleUploadError"
+                :before-upload="beforeImageUpload"
+                :multiple="true"
+                :limit="5"
+                :file-list="fileList"
+                list-type="picture-card"
+                accept="image/jpeg,image/png,image/jpg"
+              >
+                <el-icon><Plus /></el-icon>
+              </el-upload>
+            </el-form-item>
+
             <!-- 多语言信息 -->
             <el-tabs v-model="activeLang">
               <el-tab-pane 
@@ -126,7 +163,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
@@ -155,6 +192,8 @@ const productForm = ref({
   weight: 0,
   status: true,
   categoryId: null,
+  mainImage: '',
+  images: [],
   translations: {
     zh: { name: '', description: '', specifications: {} },
     en: { name: '', description: '', specifications: {} },
@@ -220,6 +259,9 @@ const initSpecKeys = (translations) => {
   specKeys.value = keys
 }
 
+// 图片列表
+const fileList = ref([])
+
 // 获取商品详情
 const getProductDetail = async () => {
   try {
@@ -238,10 +280,21 @@ const getProductDetail = async () => {
         weight: Number(data.weight),
         status: data.status,
         categoryId: data.category?.id,
+        // 设置完整的图片URL
+        mainImage: data.image ? `${request.defaults.baseURL}/${data.image}` : '',
+        images: data.images || [],
         translations: {
           ...defaultTranslations,
           ...data.translations
         }
+      }
+
+      // 设置图片列表用于显示
+      if (data.images && data.images.length > 0) {
+        fileList.value = data.images.map(img => ({
+          name: img.split('/').pop(),
+          url: `${request.defaults.baseURL}/${img}`
+        }))
       }
 
       // 确保每个语言都有完整的数据结构
@@ -271,10 +324,12 @@ const handleSubmit = async () => {
   
   try {
     await formRef.value.validate()
-    // 处理表单数据，只保留有内容的语言
     const formData = {
       ...productForm.value,
-      translations: {}
+      translations: {},
+      // 移除baseURL，只保留相对路径
+      mainImage: productForm.value.mainImage?.replace(request.defaults.baseURL + '/', ''),
+      images: productForm.value.images.map(img => img.replace(request.defaults.baseURL + '/', ''))
     }
     
     // 遍历所有语言
@@ -362,6 +417,60 @@ watch(currentLang, () => {
   getCategories()
 })
 
+// 上传相关
+const uploadHeaders = computed(() => ({
+  Authorization: `Bearer ${sessionStorage.getItem('token')}`
+}))
+
+// 上传前验证
+const beforeImageUpload = (file) => {
+  const isImage = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg'
+  const isLt2M = file.size / 1024 / 1024 < 2
+
+  if (!isImage) {
+    ElMessage.error(t('product.imageTypeError'))
+    return false
+  }
+  if (!isLt2M) {
+    ElMessage.error(t('product.imageSizeError'))
+    return false
+  }
+  return true
+}
+
+// 主图上传成功
+const handleMainImageSuccess = (response) => {
+  if (response.code === 200) {
+    // 使用完整的图片URL
+    productForm.value.mainImage = `${request.defaults.baseURL}/${response.data.image}`
+    ElMessage.success(t('product.uploadSuccess'))
+  } else {
+    ElMessage.error(response.message || t('product.uploadFailed'))
+  }
+}
+
+// 图片集上传成功
+const handleImagesSuccess = (response) => {
+  if (response.code === 200) {
+    // 添加新上传的图片到列表
+    const newImage = response.data.images[0]
+    productForm.value.images.push(newImage)
+    fileList.value.push({
+      name: newImage.split('/').pop(),
+      url: `${request.defaults.baseURL}/${newImage}`
+    })
+    ElMessage.success(t('product.uploadSuccess'))
+  } else {
+    ElMessage.error(response.message || t('product.uploadFailed'))
+  }
+}
+
+// 上传失败处理
+const handleUploadError = (error) => {
+  console.error('Upload error:', error)
+  ElMessage.error(t('product.uploadFailed'))
+}
+
 // 初始化
 onMounted(() => {
   if (route.params.id) {
@@ -387,17 +496,20 @@ onMounted(() => {
   margin-bottom: 8px;
 }
 
-.add-spec-btn {
-  margin-top: 10px;
-  width: 100%;
+/* 调整数字输入框的宽度 */
+:deep(.el-input-number.el-input-number--default) {
+  width: 160px !important;
+}
+
+/* 确保输入框之间有足够间距 */
+.el-col {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 :deep(.el-card__body) {
   padding: 15px;
-}
-
-.mb-2 {
-  margin-bottom: 12px;
 }
 
 /* 确保规格卡片有足够的高度和滚动条 */
@@ -418,5 +530,67 @@ onMounted(() => {
 
 :deep(.el-card)::-webkit-scrollbar-track {
   background-color: #f5f7fa;
+}
+
+/* 商品主图上传样式 */
+.product-image-upload {
+  width: 200px;
+  height: 200px;
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: border-color 0.3s;
+  margin-right: 20px;
+}
+
+.product-image-upload:hover {
+  border-color: #409EFF;
+}
+
+.uploaded-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.upload-icon {
+  font-size: 28px;
+  color: #8c939d;
+  margin-bottom: 8px;
+}
+
+.upload-text {
+  font-size: 14px;
+  color: #606266;
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 4px 0;
+}
+
+/* 商品图片集上传样式 */
+.product-images-upload :deep(.el-upload--picture-card) {
+  width: 150px;
+  height: 150px;
+  line-height: 150px;
+}
+
+.product-images-upload :deep(.el-upload-list--picture-card .el-upload-list__item) {
+  width: 150px;
+  height: 150px;
+}
+
+.product-images-upload :deep(.el-upload-list--picture-card) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 </style> 

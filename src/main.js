@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import store from './store'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import * as ElementPlusIcons from '@element-plus/icons-vue'
@@ -10,12 +11,14 @@ import permission from './directives/permission'
 const app = createApp(App)
 
 // 注册所有图标
-for (const [key, component] of Object.entries(ElementPlusIcons)) {
+Object.entries(ElementPlusIcons).forEach(([key, component]) => {
   app.component(key, component)
-}
+})
 
-app.use(router)
 app.use(ElementPlus)
+app.use(router)
+app.use(store)
 app.use(i18n)
-app.directive('permission', permission)
+app.use(permission)
+
 app.mount('#app')

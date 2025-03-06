@@ -19,6 +19,23 @@
             {{ formatDateTime(scope.row.createTime) }}
           </template>
         </el-table-column>
+        <el-table-column prop="image" :label="t('category.image')" width="120">
+          <template #default="scope">
+            <el-image
+              v-if="scope.row.image"
+              :src="scope.row.image.startsWith('/') ? 
+                `${request.defaults.baseURL}/${scope.row.image.slice(1)}` : 
+                `${request.defaults.baseURL}/${scope.row.image}`"
+              fit="cover"
+              style="width: 80px; height: 80px"
+            >
+              <template #error>
+                <el-icon><Picture /></el-icon>
+              </template>
+            </el-image>
+            <el-icon v-else><Picture /></el-icon>
+          </template>
+        </el-table-column>
         <el-table-column :label="t('common.operation')" width="200">
           <template #default="scope">
             <el-button 
@@ -79,6 +96,26 @@
             </el-form-item>
           </el-tab-pane>
         </el-tabs>
+        <el-form-item :label="t('category.image')">
+          <el-upload
+            class="category-image-upload"
+            :action="`${request.defaults.baseURL}/temp-upload`"
+            :headers="uploadHeaders"
+            :show-file-list="false"
+            :before-upload="beforeImageUpload"
+            :on-success="handleImageSuccess"
+            :on-error="handleUploadError"
+            accept="image/jpeg,image/png,image/jpg,image/gif"
+          >
+            <img 
+              v-if="categoryForm.tempImage || categoryForm.image" 
+              :src="getImageUrl(categoryForm.tempImage || categoryForm.image)" 
+              class="uploaded-image"
+            >
+            <el-icon v-else class="upload-icon"><Plus /></el-icon>
+            <div class="upload-text">{{ t('category.uploadImage') }}</div>
+          </el-upload>
+        </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
@@ -95,10 +132,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Edit, Delete } from '@element-plus/icons-vue'
+import { Plus, Edit, Delete, Picture } from '@element-plus/icons-vue'
 import request from '@/utils/request'
 
 const { t } = useI18n()
@@ -128,8 +165,45 @@ const categoryForm = ref({
     zh: { name: '', description: '' },
     en: { name: '', description: '' },
     ja: { name: '', description: '' }
-  }
+  },
+  image: '',      // 已有图片路径
+  tempImage: ''   // 临时上传的图片URL
 })
+
+// 添加上传相关方法
+const uploadHeaders = computed(() => ({
+  Authorization: `Bearer ${sessionStorage.getItem('token')}`
+}))
+
+const beforeImageUpload = (file) => {
+  const isImage = /^image\/(jpeg|png|jpg|gif)$/.test(file.type)
+  const isLt5M = file.size / 1024 / 1024 < 5
+
+  if (!isImage) {
+    ElMessage.error(t('category.imageTypeError'))
+    return false
+  }
+  if (!isLt5M) {
+    ElMessage.error(t('category.imageSizeError'))
+    return false
+  }
+  return true
+}
+
+const handleImageSuccess = (response) => {
+  if (response.code === 200) {
+    // 移除路径开头的斜杠，避免双斜杠
+    const imagePath = response.data.path.startsWith('/') ? response.data.path.slice(1) : response.data.path
+    categoryForm.value.tempImage = `${request.defaults.baseURL}/${imagePath}`
+    ElMessage.success(t('category.uploadSuccess'))
+  } else {
+    ElMessage.error(response.message || t('category.uploadFailed'))
+  }
+}
+
+const handleUploadError = () => {
+  ElMessage.error(t('category.uploadFailed'))
+}
 
 // 自定义验证函数：检查是否至少有一个语言的名称不为空
 const validateTranslations = (rule, value, callback) => {
@@ -176,7 +250,8 @@ const getCategoryList = async () => {
     const currentLang = getLanguageCode(locale.value)
     const { code, data, message } = await request.get('/categories', {
       params: {
-        lang: currentLang // 添加语言参数
+        lang: currentLang, // 当前显示语言
+        withTranslations: false // 列表不需要所有翻译数据
       }
     })
     if (code === 200) {
@@ -203,23 +278,53 @@ const handleAdd = () => {
       zh: { name: '', description: '' },
       en: { name: '', description: '' },
       ja: { name: '', description: '' }
-    }
+    },
+    image: '',
+    tempImage: ''
   }
   dialogVisible.value = true
 }
 
-// 修改处理编辑分类
-const handleEdit = (row) => {
-  isEdit.value = true
-  categoryForm.value = {
-    id: row.id,
-    translations: row.translations || {
-      zh: { name: row.name || '', description: row.description || '' },
-      en: { name: '', description: '' },
-      ja: { name: '', description: '' }
+// 添加一个工具函数来处理图片 URL
+const getImageUrl = (path) => {
+  if (!path) return ''
+  if (path.startsWith('http')) return path // 如果已经是完整URL则直接返回
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path
+  return `${request.defaults.baseURL}/${cleanPath}`
+}
+
+// 修改获取分类详情的方法
+const getCategoryDetail = async (id) => {
+  try {
+    const { code, data } = await request.get(`/categories/${id}`)
+    if (code === 200 && data) {
+      // 设置表单数据
+      categoryForm.value = {
+        id: data.id,
+        image: data.image,
+        tempImage: data.image ? getImageUrl(data.image) : '', // 使用工具函数处理图片URL
+        translations: {
+          zh: { name: '', description: '' },
+          en: { name: '', description: '' },
+          ja: { name: '', description: '' },
+          ...data.translations
+        }
+      }
+    } else {
+      ElMessage.error(t('category.getFailed'))
     }
+  } catch (error) {
+    console.error('获取分类详情失败:', error)
+    ElMessage.error(t('category.getFailed'))
   }
+}
+
+// 修改编辑方法
+const handleEdit = async (row) => {
+  isEdit.value = true
   dialogVisible.value = true
+  // 获取分类详情，包含所有语言的翻译
+  await getCategoryDetail(row.id)
 }
 
 // 处理删除分类
@@ -250,22 +355,48 @@ const handleDelete = async (row) => {
   }
 }
 
-// 修改表单提交
+// 修改表单提交方法
 const handleSubmit = async () => {
   if (!categoryFormRef.value) return
 
   try {
     await categoryFormRef.value.validate()
-    // 获取当前语言代码并转换为数据库支持的格式
-    const currentLang = getLanguageCode(locale.value)
     
+    // 创建 FormData 对象
+    const formData = new FormData()
+    
+    // 过滤掉空的翻译数据
+    const filteredTranslations = {}
+    Object.entries(categoryForm.value.translations).forEach(([lang, translation]) => {
+      if (translation.name.trim()) {
+        filteredTranslations[lang] = translation
+      }
+    })
+    
+    // 添加翻译数据
+    formData.append('translations', JSON.stringify(filteredTranslations))
+    
+    // 如果有临时图片，需要重新获取文件并以 'image' 字段名提交
+    if (categoryForm.value.tempImage) {
+      try {
+        const response = await fetch(categoryForm.value.tempImage)
+        const blob = await response.blob()
+        formData.append('image', blob, 'category-image.jpg')  // 使用 'image' 作为字段名
+      } catch (error) {
+        console.error('获取图片文件失败:', error)
+        ElMessage.error(t('category.uploadFailed'))
+        return
+      }
+    }
+
     if (isEdit.value) {
-      // 编辑分类
-      const { code, message } = await request.put(`/categories/${categoryForm.value.id}`, {
-        name: categoryForm.value.name,
-        description: categoryForm.value.description,
-        lang: currentLang
-      })
+      const { code, message } = await request.put(
+        `/categories/${categoryForm.value.id}`, 
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        }
+      )
       if (code === 200) {
         ElMessage.success(t('category.editSuccess'))
         dialogVisible.value = false
@@ -274,12 +405,13 @@ const handleSubmit = async () => {
         ElMessage.error(message || t('category.editFailed'))
       }
     } else {
-      // 添加分类
-      const { code, message } = await request.post('/categories', {
-        name: categoryForm.value.name,
-        description: categoryForm.value.description,
-        lang: currentLang
-      })
+      const { code, message } = await request.post(
+        '/categories', 
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        }
+      )
       if (code === 200) {
         ElMessage.success(t('category.addSuccess'))
         dialogVisible.value = false
@@ -318,18 +450,24 @@ onMounted(() => {
 <style scoped>
 .category-container {
   padding: 20px;
+  height: 100%;  /* 使用100%高度 */
+  box-sizing: border-box;
+  overflow: auto;  /* 添加滚动 */
 }
 
 .category-card {
-  min-height: calc(100vh - 180px);
+  height: 100%;  /* 改为100%高度 */
+}
+
+/* 确保表格容器可以滚动 */
+:deep(.el-card__body) {
+  padding: 20px;
+  height: calc(100% - 40px);  /* 减去padding的高度 */
+  overflow: auto;  /* 添加滚动 */
 }
 
 .header-actions {
   margin-bottom: 20px;
-}
-
-:deep(.el-card__body) {
-  padding: 20px;
 }
 
 .operation-buttons {
@@ -340,5 +478,45 @@ onMounted(() => {
 
 :deep(.el-tabs__content) {
   padding: 20px 0;
+}
+
+.category-image-upload {
+  text-align: center;
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  width: 180px;
+  height: 180px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.category-image-upload:hover {
+  border-color: #409eff;
+}
+
+.upload-icon {
+  font-size: 28px;
+  color: #8c939d;
+}
+
+.upload-text {
+  color: #8c939d;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.uploaded-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.el-image {
+  border-radius: 4px;
+  overflow: hidden;
 }
 </style> 

@@ -3,6 +3,7 @@ import InventoryManagement from '@/views/warehouse/InventoryManagement.vue'
 import LayoutContainer from '@/layout'
 import { routePermissions, hasPermission } from '@/utils/permission'
 import { ElMessage } from 'element-plus'
+import shopRoutes from './shop'
 
 const routes = [
   {
@@ -28,7 +29,7 @@ const routes = [
       },
       {
         path: '/products',
-        name: 'ProductList',
+        name: 'AdminProductList',
         component: () => import('@/views/products/ProductList.vue'),
         meta: { title: 'menu.products.list' }
       },
@@ -67,13 +68,13 @@ const routes = [
       },
       {
         path: '/products/:id',
-        name: 'ProductDetail',
+        name: 'AdminProductDetail',
         component: () => import('@/views/products/ProductDetail.vue'),
         meta: { title: 'product.detail' },
         children: [
           {
             path: 'inventory',
-            name: 'ProductInventory',
+            name: 'AdminProductInventory',
             component: InventoryManagement,
             meta: { title: 'inventory.title' }
           }
@@ -97,7 +98,8 @@ const routes = [
         component: () => import('@/views/products/AddProduct.vue')
       }
     ]
-  }
+  },
+  shopRoutes
 ]
 
 const router = createRouter({
@@ -119,7 +121,19 @@ router.beforeEach((to, from, next) => {
     return next('/welcome')
   }
   
-  next()
+  // 检查是否需要登录权限
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!token) {
+      next({
+        path: '/shop/login',
+        query: { redirect: to.fullPath }
+      })
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
 })
 
 export default router 

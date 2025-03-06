@@ -15,7 +15,7 @@
       <el-form :inline="true" :model="queryForm" class="search-form">
         <el-form-item>
           <el-input
-            v-model="queryForm.name"
+            v-model="queryForm.query"
             :placeholder="t('product.searchPlaceholder')"
             clearable
             @keyup.enter="handleSearch"
@@ -121,7 +121,7 @@ const tableHeight = ref('calc(100vh - 300px)')
 
 // 查询表单
 const queryForm = ref({
-  name: '',
+  query: '',
   pageNum: 1,
   pageSize: 10
 })
@@ -161,7 +161,7 @@ const handleSearch = () => {
 // 重置
 const handleReset = () => {
   queryForm.value = {
-    name: '',
+    query: '',
     pageNum: 1,
     pageSize: 10
   }
@@ -184,7 +184,7 @@ const handleSizeChange = (val) => {
 // 跳转到库存管理
 const handleInventory = (row) => {
   router.push({
-    name: 'ProductInventory',
+    name: 'AdminProductInventory',
     params: { id: row.id }
   })
 }
@@ -192,7 +192,7 @@ const handleInventory = (row) => {
 // 编辑商品
 const handleEdit = (row) => {
   router.push({
-    name: 'ProductDetail',
+    name: 'AdminProductDetail',
     params: { id: row.id }
   })
 }

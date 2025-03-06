@@ -33,10 +33,10 @@
         </el-form-item>
         <!-- 按钮区域 -->
         <el-form-item class="btns">
-          <el-button type="primary" @click="login" :loading="loading">登录</el-button>
-          <el-button type="info" @click="resetLoginForm">重置</el-button>
+          <el-button style="width: 100%;" type="primary" @click="login" :loading="loading">登录</el-button>
+          <!-- <el-button type="info" @click="resetLoginForm">重置</el-button> -->
         </el-form-item>
-        <div class="copyright">&copy; 2024-2025 dukue</div>
+        <div class="copyright">&copy; 2024-2025 丁凯 毕设</div>
       </el-form>
     </div>
   </div>
@@ -74,9 +74,9 @@ const loginRules = {
 }
 
 // 重置登录表单
-const resetLoginForm = () => {
-  loginFormRef.value.resetFields()
-}
+// const resetLoginForm = () => {
+//   loginFormRef.value.resetFields()
+// }
 
 // 登录
 const login = () => {

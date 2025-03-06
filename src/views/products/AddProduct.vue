@@ -1,3 +1,4 @@
+<!-- eslint-disable no-undef, vue/no-setup-props-destructure -->
 <template>
   <div class="add-product">
     <el-card>
@@ -43,6 +44,43 @@
               :value="item.id"
             />
           </el-select>
+        </el-form-item>
+
+        <!-- 商品主图上传 -->
+        <el-form-item :label="t('product.mainImage')" prop="mainImage">
+          <el-upload
+            class="product-image-upload"
+            :action="`${request.defaults.baseURL}/temp-upload`"
+            :headers="uploadHeaders"
+            :show-file-list="false"
+            :before-upload="beforeImageUpload"
+            :on-success="handleMainImageSuccess"
+            :on-error="handleUploadError"
+            accept="image/jpeg,image/png,image/jpg"
+          >
+            <img v-if="productForm.tempMainImage" :src="productForm.tempMainImage" class="uploaded-image">
+            <el-icon v-else class="upload-icon"><Plus /></el-icon>
+            <div class="upload-text">{{ t('product.uploadMainImage') }}</div>
+          </el-upload>
+        </el-form-item>
+
+        <!-- 商品图片集上传 -->
+        <el-form-item :label="t('product.images')" prop="images">
+          <el-upload
+            class="product-images-upload"
+            :action="`${request.defaults.baseURL}/temp-upload`"
+            :headers="uploadHeaders"
+            :on-success="handleImagesSuccess"
+            :on-error="handleUploadError"
+            :before-upload="beforeImageUpload"
+            :multiple="true"
+            :limit="5"
+            list-type="picture-card"
+            accept="image/jpeg,image/png,image/jpg"
+            :file-list="fileList"
+          >
+            <el-icon><Plus /></el-icon>
+          </el-upload>
         </el-form-item>
 
         <!-- 多语言信息 -->
@@ -125,15 +163,16 @@
                 </el-col>
                 <el-col :span="6">
                   <el-input-number
+                    
                     v-model="item.quantity"
-                    :min="0"
+                    :min="1"
                     :placeholder="t('inventory.quantity')"
                   />
                 </el-col>
                 <el-col :span="6">
                   <el-input-number
                     v-model="item.safetyStock"
-                    :min="0"
+                    :min="1"
                     :placeholder="t('inventory.safetyStock')"
                   />
                 </el-col>
@@ -171,7 +210,8 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+/* eslint-disable */
+import { ref, watch, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
@@ -207,12 +247,19 @@ const productForm = ref({
   weight: 0,
   status: true,
   categoryId: null,
+  mainImage: '', // 数据库中的主图路径
+  images: [], // 数据库中的图片集路径
+  tempMainImage: '', // 临时主图路径
+  tempImages: [], // 临时图片集路径
   translations: { ...DEFAULT_TRANSLATIONS },
-  initialInventory: []  // 添加初始库存数组
+  initialInventory: []
 })
 
 // 规格键临时存储
 const specKeys = ref({})
+
+// 图片列表
+const fileList = ref([])
 
 // 表单验证规则
 const rules = {
@@ -333,17 +380,163 @@ const removeInventory = (index) => {
   productForm.value.initialInventory.splice(index, 1)
 }
 
+// 上传相关
+const uploadHeaders = computed(() => ({
+  Authorization: `Bearer ${sessionStorage.getItem('token')}`
+}))
+
+// 上传前验证
+const beforeImageUpload = (file) => {
+  const isImage = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg'
+  const isLt5M = file.size / 1024 / 1024 < 5
+
+  if (!isImage) {
+    ElMessage.error(t('product.imageTypeError'))
+    return false
+  }
+  if (!isLt5M) {
+    ElMessage.error(t('product.imageSizeError'))
+    return false
+  }
+  return true
+}
+
+// 主图上传成功
+const handleMainImageSuccess = (response) => {
+  if (response.code === 200 && response.data) {
+    const imageUrl = `${request.defaults.baseURL}/${response.data.path}`
+    productForm.value.tempMainImage = imageUrl
+    ElMessage.success(t('product.uploadSuccess'))
+  } else {
+    ElMessage.error(response.message || t('product.uploadFailed'))
+  }
+}
+
+// 图片集上传成功
+const handleImagesSuccess = (response) => {
+  if (response.code === 200 && response.data) {
+    const imageUrl = `${request.defaults.baseURL}/${response.data.path}`
+    productForm.value.tempImages.push(imageUrl)
+    fileList.value.push({
+      name: response.data.filename,
+      url: imageUrl
+    })
+    ElMessage.success(t('product.uploadSuccess'))
+  } else {
+    ElMessage.error(response.message || t('product.uploadFailed'))
+  }
+}
+
+// 上传失败处理
+const handleUploadError = (error) => {
+  console.error('Upload error:', error)
+  ElMessage.error(t('product.uploadFailed'))
+}
+
+// 上传商品图片
+const uploadProductImages = async (productId) => {
+  try {
+    // 上传主图
+    if (productForm.value.tempMainImage) {
+      const mainImageFormData = new FormData()
+      mainImageFormData.append('image', await fetch(productForm.value.tempMainImage).then(r => r.blob()))
+      const { code, data } = await request.post(`/products/${productId}/image`, mainImageFormData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      if (code === 200) {
+        productForm.value.mainImage = data.image
+      }
+    }
+
+    // 上传图片集
+    if (productForm.value.tempImages.length > 0) {
+      const imagesFormData = new FormData()
+      for (const tempImage of productForm.value.tempImages) {
+        const imageBlob = await fetch(tempImage).then(r => r.blob())
+        imagesFormData.append('images', imageBlob)
+      }
+      const { code, data } = await request.post(`/products/${productId}/images`, imagesFormData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      if (code === 200) {
+        productForm.value.images = data.images
+      }
+    }
+  } catch (error) {
+    console.error('上传商品图片失败:', error)
+    ElMessage.error(t('product.uploadFailed'))
+    throw error
+  }
+}
+
+// 获取商品详情
+const getProductDetail = async (id) => {
+  try {
+    const { code, data } = await request.get(`/products/${id}`)
+    if (code === 200 && data) {
+      // 设置基本信息
+      productForm.value.price = data.price
+      productForm.value.weight = data.weight
+      productForm.value.status = data.status
+      productForm.value.categoryId = data.categoryId
+      
+      // 设置图片信息 - 注意这里使用 image 而不是 mainImage
+      if (data.image) {
+        productForm.value.mainImage = data.image
+        productForm.value.tempMainImage = `${request.defaults.baseURL}/${data.image}`
+      }
+      
+      if (data.images && data.images.length > 0) {
+        productForm.value.images = data.images
+        productForm.value.tempImages = data.images.map(img => `${request.defaults.baseURL}/${img}`)
+        fileList.value = data.images.map(img => ({
+          name: img.split('/').pop(),
+          url: `${request.defaults.baseURL}/${img}`
+        }))
+      }
+
+      // 设置翻译信息
+      if (data.translations) {
+        productForm.value.translations = {
+          ...DEFAULT_TRANSLATIONS,
+          ...data.translations
+        }
+      }
+
+      // 设置库存信息
+      if (data.initialInventory) {
+        productForm.value.initialInventory = [...data.initialInventory]
+      }
+    }
+  } catch (error) {
+    console.error('获取商品详情失败:', error)
+    ElMessage.error(t('product.getDetailFailed'))
+  }
+}
+
 // 提交表单
 const handleSubmit = async () => {
   if (!formRef.value) return
   
   try {
     await formRef.value.validate()
-    // 处理表单数据，只保留有内容的语言
     const formData = {
       ...productForm.value,
       translations: {}
     }
+    
+    // 处理图片路径 - 确保使用正确的字段名
+    formData.image = productForm.value.mainImage
+    formData.images = productForm.value.images
+    
+    // 移除不需要的字段
+    delete formData.tempMainImage
+    delete formData.tempImages
+    delete formData.mainImage  // 删除 mainImage，因为后端使用 image
     
     // 遍历所有语言
     Object.entries(productForm.value.translations).forEach(([lang, translation]) => {
@@ -375,22 +568,36 @@ const handleSubmit = async () => {
       return
     }
 
-    const { code, message } = await request.post('/products', formData)
+    const id = router.currentRoute.value.params.id
+    const { code, data, message } = id ? 
+      await request.put(`/products/${id}`, formData) :
+      await request.post('/products', formData)
     
     if (code === 200) {
-      ElMessage.success(t('product.addSuccess'))
+      // 上传商品图片
+      if (id) {
+        await uploadProductImages(id)
+      } else {
+        await uploadProductImages(data.id)
+      }
+      
+      ElMessage.success(id ? t('product.updateSuccess') : t('product.addSuccess'))
       router.push('/products')
     } else {
-      ElMessage.error(message || t('product.addFailed'))
+      ElMessage.error(message || (id ? t('product.updateFailed') : t('product.addFailed')))
     }
   } catch (error) {
-    console.error('添加商品失败:', error)
-    ElMessage.error(t('product.addFailed'))
+    console.error(id ? '更新商品失败:' : '添加商品失败:', error)
+    ElMessage.error(id ? t('product.updateFailed') : t('product.addFailed'))
   }
 }
 
 // 在组件挂载时初始化
-onMounted(() => {
+onMounted(async () => {
+  const id = router.currentRoute.value.params.id
+  if (id) {
+    await getProductDetail(id)
+  }
   getCategories()
   getWarehouses()
 })
@@ -426,6 +633,18 @@ const getCategoryName = (category) => {
   padding: 15px;
 }
 
+/* 调整数字输入框的宽度 */
+:deep(.el-input-number.el-input-number--default) {
+  width: 160px !important;
+}
+
+/* 确保输入框之间有足够间距 */
+.el-col {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 /* 规格卡片样式 */
 :deep(.el-card) {
   max-height: 560px;
@@ -449,5 +668,77 @@ const getCategoryName = (category) => {
 .add-inventory-btn {
   margin-top: 10px;
   width: 100%;
+}
+
+/* 商品主图上传样式 */
+.product-image-upload {
+  width: 200px;
+  height: 200px;
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: border-color 0.3s;
+  margin-right: 20px;
+}
+
+.product-image-upload:hover {
+  border-color: #409EFF;
+}
+
+.uploaded-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.upload-icon {
+  font-size: 28px;
+  color: #8c939d;
+  margin-bottom: 8px;
+}
+
+.upload-text {
+  font-size: 14px;
+  color: #606266;
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 4px 0;
+}
+
+/* 商品图片集上传样式 */
+.product-images-upload :deep(.el-upload--picture-card) {
+  width: 150px;
+  height: 150px;
+  line-height: 150px;
+}
+
+.product-images-upload :deep(.el-upload-list--picture-card .el-upload-list__item) {
+  width: 150px;
+  height: 150px;
+}
+
+.product-images-upload :deep(.el-upload-list--picture-card) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* 表单项样式调整 */
+:deep(.el-form-item__content) {
+  display: flex;
+  align-items: flex-start;
+}
+
+:deep(.el-form-item__label) {
+  padding-top: 8px;
 }
 </style> 
