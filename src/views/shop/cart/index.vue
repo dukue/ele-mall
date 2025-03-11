@@ -27,12 +27,12 @@
           <div v-for="item in cartItems" :key="item.id" class="cart-item">
             <el-checkbox v-model="item.selected" @change="handleItemSelect"></el-checkbox>
             <div class="item-info">
-              <img :src="item.productImage" :alt="item.productName">
+              <img :src="getImageUrl(item.productImage)" :alt="item.productName">
               <div class="product-info">
                 <h3 @click="goToProduct(item.productId)">{{ item.productName }}</h3>
               </div>
             </div>
-            <div class="item-price">¥ {{ item.price }}</div>
+            <div class="item-price">¥ {{ formatPrice(item.price) }}</div>
             <div class="item-quantity">
               <el-input-number 
                 v-model="item.quantity" 
@@ -42,7 +42,7 @@
                 @change="(value) => handleQuantityChange(item.id, value)">
               </el-input-number>
             </div>
-            <div class="item-total">¥ {{ (item.price * item.quantity).toFixed(2) }}</div>
+            <div class="item-total">¥ {{ formatPrice(item.price * item.quantity) }}</div>
             <div class="item-action">
               <el-button 
                 type="text" 
@@ -80,6 +80,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import { getImageUrl } from '@/utils/image'
 
 export default {
   name: 'ShoppingCart',
@@ -106,6 +107,12 @@ export default {
     this.getCartItems()
   },
   methods: {
+    getImageUrl(path) {
+      return getImageUrl(path)
+    },
+    formatPrice(price) {
+      return Number(price).toFixed(2)
+    },
     async getCartItems() {
       this.loading = true
       try {
@@ -190,11 +197,25 @@ export default {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  height: calc(100vh - 80px);
+  overflow: hidden;
 
   .cart-card {
-    .card-header {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    :deep(.el-card__header) {
+      padding: 15px 20px;
+      border-bottom: 1px solid #ebeef5;
       font-size: 18px;
       font-weight: bold;
+    }
+
+    :deep(.el-card__body) {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0;
     }
 
     .empty-cart {
@@ -203,6 +224,8 @@ export default {
     }
 
     .cart-content {
+      padding: 20px;
+
       .cart-header {
         display: grid;
         grid-template-columns: 50px 400px 150px 150px 150px 100px;
@@ -285,44 +308,8 @@ export default {
 
 @media screen and (max-width: 768px) {
   .cart-container {
-    .cart-card {
-      .cart-content {
-        .cart-header {
-          display: none;
-        }
-
-        .cart-items {
-          .cart-item {
-            grid-template-columns: 1fr;
-            gap: 10px;
-            padding: 10px;
-
-            .item-info {
-              flex-direction: column;
-              text-align: center;
-            }
-
-            .item-price, .item-quantity, .item-total, .item-action {
-              text-align: center;
-            }
-          }
-        }
-
-        .cart-footer {
-          flex-direction: column;
-          gap: 20px;
-
-          .footer-right {
-            flex-direction: column;
-            width: 100%;
-
-            .el-button {
-              width: 100%;
-            }
-          }
-        }
-      }
-    }
+    padding: 10px;
+    height: calc(100vh - 60px);
   }
 }
 </style> 

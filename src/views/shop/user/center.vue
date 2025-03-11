@@ -30,22 +30,22 @@
             </template>
             <div class="order-overview">
               <div class="overview-item" @click="goToOrders('pending')">
-                <i class="el-icon-wallet"></i>
+                <img src="@/assets/wallet.svg" class="status-icon" alt="待付款" />
                 <span>待付款</span>
                 <el-badge :value="orderCounts.pending" class="count-badge" v-if="orderCounts.pending"></el-badge>
               </div>
               <div class="overview-item" @click="goToOrders('paid')">
-                <i class="el-icon-box"></i>
+                <img src="@/assets/box.svg" class="status-icon" alt="待发货" />
                 <span>待发货</span>
                 <el-badge :value="orderCounts.paid" class="count-badge" v-if="orderCounts.paid"></el-badge>
               </div>
               <div class="overview-item" @click="goToOrders('shipped')">
-                <i class="el-icon-truck"></i>
+                <img src="@/assets/truck.svg" class="status-icon" alt="待收货" />
                 <span>待收货</span>
                 <el-badge :value="orderCounts.shipped" class="count-badge" v-if="orderCounts.shipped"></el-badge>
               </div>
               <div class="overview-item" @click="goToOrders('completed')">
-                <i class="el-icon-circle-check"></i>
+                <img src="@/assets/check.svg" class="status-icon" alt="已完成" />
                 <span>已完成</span>
               </div>
             </div>
@@ -250,9 +250,10 @@ export default {
     async getAddresses() {
       this.addressLoading = true
       try {
-        const { data } = await this.$store.dispatch('shop/address/getAddresses')
-        this.addresses = data.list
+        const { list } = await this.$store.dispatch('shop/address/getAddresses')
+        this.addresses = list || []
       } catch (error) {
+        console.error('获取地址列表失败:', error)
         this.$message.error('获取地址列表失败')
       } finally {
         this.addressLoading = false
@@ -260,19 +261,24 @@ export default {
     },
     async getOrderCounts() {
       try {
-        const { data } = await this.$store.dispatch('shop/order/getOrders')
+        const { list } = await this.$store.dispatch('shop/order/getOrders')
         const counts = {
           pending: 0,
           paid: 0,
-          shipped: 0
+          shipped: 0,
+          completed: 0,
+          cancelled: 0
         }
-        data.list.forEach(order => {
-          if (Object.prototype.hasOwnProperty.call(counts, order.status)) {
-            counts[order.status]++
-          }
-        })
+        if (list && Array.isArray(list)) {
+          list.forEach(order => {
+            if (order.status in counts) {
+              counts[order.status]++
+            }
+          })
+        }
         this.orderCounts = counts
       } catch (error) {
+        console.error('获取订单统计失败:', error)
         this.$message.error('获取订单统计失败')
       }
     },
@@ -392,28 +398,33 @@ export default {
         text-align: center;
 
         .overview-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
           cursor: pointer;
-          padding: 10px;
-          position: relative;
+          padding: 15px;
+          border-radius: 4px;
+          transition: all 0.3s;
 
           &:hover {
-            color: #409EFF;
+            background: #f5f7fa;
           }
 
-          i {
-            font-size: 24px;
-            margin-bottom: 5px;
+          .status-icon {
+            width: 24px;
+            height: 24px;
           }
 
           span {
-            display: block;
             font-size: 14px;
+            color: #606266;
           }
 
           .count-badge {
-            position: absolute;
-            top: 0;
-            right: 20px;
+            :deep(.el-badge__content) {
+              background-color: #f56c6c;
+            }
           }
         }
       }

@@ -8,9 +8,9 @@ export function createOrder(data) {
   })
 }
 
-export function getOrders() {
+export function getOrders(status) {
   return request({
-    url: '/mall/order',
+    url: status ? `/mall/order?status=${status}` : '/mall/order',
     method: 'get'
   })
 }

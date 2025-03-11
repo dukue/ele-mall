@@ -163,9 +163,10 @@ export default {
     async getAddresses() {
       this.loading = true
       try {
-        const { data } = await this.$store.dispatch('shop/address/getAddresses')
-        this.addresses = data.list
+        const data = await this.$store.dispatch('shop/address/getAddresses')
+        this.addresses = data.list || []
       } catch (error) {
+        console.error('获取地址列表失败:', error)
         this.$message.error('获取地址列表失败')
       } finally {
         this.loading = false
@@ -199,8 +200,18 @@ export default {
     },
     async handleSetDefault(id) {
       try {
-        await this.$store.dispatch('shop/address/updateAddress', id, {
-          isDefault: true
+        // 找到当前地址的完整信息
+        const address = this.addresses.find(addr => addr.id === id)
+        if (!address) {
+          throw new Error('地址不存在')
+        }
+        
+        await this.$store.dispatch('shop/address/updateAddress', {
+          id,
+          addressData: {
+            ...address,
+            isDefault: true
+          }
         })
         this.$message.success('设置成功')
         this.getAddresses()
@@ -214,7 +225,10 @@ export default {
           this.submitting = true
           try {
             if (this.isEdit) {
-              await this.$store.dispatch('shop/address/updateAddress', this.addressForm.id, this.addressForm)
+              await this.$store.dispatch('shop/address/updateAddress', {
+                id: this.addressForm.id,
+                addressData: this.addressForm
+              })
               this.$message.success('更新成功')
             } else {
               await this.$store.dispatch('shop/address/addAddress', this.addressForm)

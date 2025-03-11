@@ -13,12 +13,12 @@
           <template v-if="isLoggedIn">
             <router-link to="/shop/cart" class="cart-link">
               <el-badge :value="cartCount" class="cart-badge">
-                <i class="el-icon-shopping-cart-2"></i>
+                <img src="@/assets/cart.svg" class="icon" alt="购物车" />
               </el-badge>
             </router-link>
             <el-dropdown @command="handleCommand">
               <span class="el-dropdown-link">
-                {{ username }}<i class="el-icon-arrow-down el-icon--right"></i>
+                {{ username }}<img src="@/assets/user.svg" class="icon" alt="用户" />
               </span>
               <template #dropdown>
                 <el-dropdown-menu>
@@ -51,7 +51,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 
@@ -61,6 +61,15 @@ const router = useRouter()
 const isLoggedIn = computed(() => store.state.shop.user.isLoggedIn)
 const username = computed(() => store.state.shop.user.username)
 const cartCount = computed(() => store.state.shop.cart.count)
+
+// 初始化用户状态
+onMounted(async () => {
+  try {
+    await store.dispatch('shop/user/initUserState')
+  } catch (error) {
+    console.error('初始化用户状态失败:', error)
+  }
+})
 
 const handleCommand = (command) => {
   switch (command) {
@@ -75,7 +84,7 @@ const handleCommand = (command) => {
       break
     case 'logout':
       store.dispatch('shop/user/logout')
-      router.push('/shop')
+      router.push('/shop/login')
       break
   }
 }
@@ -138,13 +147,28 @@ const handleCommand = (command) => {
         &:hover {
           color: #409EFF;
         }
+
+        .icon {
+          width: 24px;
+          height: 24px;
+          vertical-align: middle;
+        }
       }
 
       .el-dropdown-link {
         cursor: pointer;
         color: #606266;
+        display: flex;
+        align-items: center;
+        gap: 4px;
         &:hover {
           color: #409EFF;
+        }
+
+        .icon {
+          width: 20px;
+          height: 20px;
+          vertical-align: middle;
         }
       }
     }

@@ -109,10 +109,23 @@ const router = createRouter({
 
 // 导航守卫
 router.beforeEach((to, from, next) => {
-  if (to.path === '/login') return next()
+  // 允许访问登录和注册页面
+  if (to.path === '/login' || to.path === '/shop/login' || to.path === '/shop/register') {
+    return next()
+  }
   
   const token = window.sessionStorage.getItem('token')
-  if (!token) return next('/login')
+  if (!token) {
+    // 如果是前台页面，跳转到前台登录
+    if (to.path.startsWith('/shop')) {
+      return next({
+        path: '/shop/login',
+        query: { redirect: to.fullPath }
+      })
+    }
+    // 如果是后台页面，跳转到后台登录
+    return next('/login')
+  }
   
   // 检查路由权限
   const requiredPermissions = routePermissions[to.path]

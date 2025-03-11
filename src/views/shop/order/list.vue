@@ -30,7 +30,7 @@
           <div class="order-content">
             <div class="product-list">
               <div v-for="item in order.items" :key="item.productId" class="product-item">
-                <img :src="item.productImage" :alt="item.productName">
+                <img :src="getImageUrl(item.productImage)" :alt="item.productName">
                 <div class="product-info">
                   <h4 @click="goToProduct(item.productId)">{{ item.productName }}</h4>
                   <div class="price-quantity">
@@ -89,6 +89,7 @@
 
 <script>
 import { formatDate } from '@/utils/date'
+import { getImageUrl } from '@/utils/image'
 
 export default {
   name: 'OrderList',
@@ -105,13 +106,18 @@ export default {
     this.getOrders()
   },
   methods: {
+    getImageUrl(path) {
+      return getImageUrl(path)
+    },
     async getOrders() {
+      console.log('getOrders',this.$route.query.status)
       this.loading = true
       try {
-        const { data } = await this.$store.dispatch('shop/order/getOrders')
+        const data = await this.$store.dispatch('shop/order/getOrders',this.$route.query.status)
         this.orders = data.list
         this.total = data.total
       } catch (error) {
+        console.error('获取订单列表失败:', error)
         this.$message.error('获取订单列表失败')
       } finally {
         this.loading = false
@@ -176,11 +182,25 @@ export default {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  height: calc(100vh - 80px);
+  overflow: hidden;
 
   .order-card {
-    .card-header {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    :deep(.el-card__header) {
+      padding: 15px 20px;
+      border-bottom: 1px solid #ebeef5;
       font-size: 18px;
       font-weight: bold;
+    }
+
+    :deep(.el-card__body) {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0;
     }
 
     .empty-orders {
@@ -189,30 +209,53 @@ export default {
     }
 
     .order-list {
+      padding: 20px;
+      
       .order-item {
         margin-bottom: 20px;
+        border-radius: 8px;
+        transition: all 0.3s;
+        
+        &:hover {
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        &:last-child {
+          margin-bottom: 0;
+        }
 
         .order-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding-bottom: 15px;
-          border-bottom: 1px solid #ebeef5;
+          padding: 15px 20px;
+          background: #f8f9fa;
+          border-radius: 8px 8px 0 0;
 
           .order-info {
             .order-id {
               margin-right: 20px;
               color: #303133;
+              font-size: 14px;
             }
             .order-time {
               color: #909399;
-              font-size: 14px;
+              font-size: 13px;
+            }
+          }
+
+          .order-status {
+            :deep(.el-tag) {
+              border-radius: 4px;
+              padding: 0 12px;
+              height: 24px;
+              line-height: 24px;
             }
           }
         }
 
         .order-content {
-          padding: 15px 0;
+          padding: 20px;
 
           .product-list {
             .product-item {
@@ -220,20 +263,33 @@ export default {
               align-items: center;
               padding: 10px 0;
 
+              &:not(:last-child) {
+                border-bottom: 1px solid #f0f0f0;
+                margin-bottom: 10px;
+              }
+
               img {
                 width: 60px;
                 height: 60px;
                 object-fit: cover;
+                border-radius: 4px;
                 margin-right: 15px;
+                border: 1px solid #ebeef5;
               }
 
               .product-info {
                 flex: 1;
+                min-width: 0;
 
                 h4 {
                   margin: 0 0 8px;
                   font-size: 14px;
+                  color: #303133;
                   cursor: pointer;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  
                   &:hover {
                     color: #409EFF;
                   }
@@ -241,11 +297,12 @@ export default {
 
                 .price-quantity {
                   color: #606266;
-                  font-size: 14px;
+                  font-size: 13px;
 
                   .price {
                     color: #f56c6c;
                     margin-right: 10px;
+                    font-weight: 500;
                   }
                 }
               }
@@ -262,18 +319,39 @@ export default {
 
             .total-amount {
               color: #606266;
-              font-size: 14px;
+              font-size: 13px;
 
               .price {
                 color: #f56c6c;
                 font-size: 16px;
-                font-weight: bold;
+                font-weight: 600;
+                margin-left: 5px;
               }
             }
 
             .order-actions {
               display: flex;
-              gap: 10px;
+              gap: 8px;
+
+              .el-button {
+                padding: 6px 12px;
+                font-size: 13px;
+
+                &.el-button--text {
+                  padding: 6px 8px;
+                }
+
+                &.el-button--danger {
+                  background: #fff;
+                  border-color: #ff4d4f;
+                  color: #ff4d4f;
+
+                  &:hover {
+                    background: #ff4d4f;
+                    color: #fff;
+                  }
+                }
+              }
             }
           }
         }
@@ -281,16 +359,23 @@ export default {
     }
 
     .pagination-container {
-      margin-top: 20px;
-      text-align: center;
+      padding: 20px;
+      background: #fff;
+      border-top: 1px solid #ebeef5;
+      text-align: right;
     }
   }
 }
 
 @media screen and (max-width: 768px) {
   .order-list-container {
+    padding: 10px;
+    height: calc(100vh - 60px);
+
     .order-card {
       .order-list {
+        padding: 10px;
+
         .order-item {
           .order-header {
             flex-direction: column;
@@ -299,13 +384,23 @@ export default {
           }
 
           .order-content {
+            padding: 15px;
+
             .product-list {
               .product-item {
-                flex-direction: column;
-                text-align: center;
+                flex-direction: row;
+                text-align: left;
 
                 img {
-                  margin: 0 0 10px;
+                  width: 50px;
+                  height: 50px;
+                  margin: 0 10px 0 0;
+                }
+
+                .product-info {
+                  h4 {
+                    font-size: 13px;
+                  }
                 }
               }
             }
@@ -313,10 +408,11 @@ export default {
             .order-footer {
               flex-direction: column;
               gap: 15px;
-              text-align: center;
+              align-items: flex-start;
 
               .order-actions {
-                justify-content: center;
+                width: 100%;
+                justify-content: flex-end;
               }
             }
           }

@@ -51,16 +51,16 @@
           <h3 class="section-title">商品信息</h3>
           <div class="product-list">
             <div v-for="item in order.items" :key="item.productId" class="product-item">
-              <img :src="item.productImage" :alt="item.productName">
+              <img :src="getImageUrl(item.productImage)" :alt="item.productName">
               <div class="product-info">
                 <h4 @click="goToProduct(item.productId)">{{ item.productName }}</h4>
                 <div class="price-quantity">
-                  <span class="price">¥ {{ item.price }}</span>
+                  <span class="price">¥ {{ formatPrice(item.price) }}</span>
                   <span class="quantity">× {{ item.quantity }}</span>
                 </div>
               </div>
               <div class="item-total">
-                ¥ {{ (item.price * item.quantity).toFixed(2) }}
+                ¥ {{ formatPrice(item.price * item.quantity) }}
               </div>
             </div>
           </div>
@@ -70,7 +70,7 @@
         <div class="amount-section">
           <div class="amount-item">
             <span>商品总额：</span>
-            <span>¥ {{ order.totalAmount }}</span>
+            <span>¥ {{ formatPrice(order.totalAmount) }}</span>
           </div>
           <div class="amount-item">
             <span>运费：</span>
@@ -78,7 +78,7 @@
           </div>
           <div class="amount-item total">
             <span>实付金额：</span>
-            <span class="final-price">¥ {{ order.totalAmount }}</span>
+            <span class="final-price">¥ {{ formatPrice(order.totalAmount) }}</span>
           </div>
         </div>
 
@@ -104,6 +104,7 @@
 
 <script>
 import { formatDate } from '@/utils/date'
+import { getImageUrl } from '@/utils/image'
 
 export default {
   name: 'OrderDetail',
@@ -122,12 +123,19 @@ export default {
     this.getOrderDetail()
   },
   methods: {
+    getImageUrl(path) {
+      return getImageUrl(path)
+    },
+    formatPrice(price) {
+      return Number(price).toFixed(2)
+    },
     async getOrderDetail() {
       this.loading = true
       try {
-        const { data } = await this.$store.dispatch('shop/order/getOrderDetail', this.$route.params.id)
+        const data = await this.$store.dispatch('shop/order/getOrderDetail', this.$route.params.id)
         this.order = data
       } catch (error) {
+        console.error('获取订单详情失败:', error)
         this.$message.error('获取订单详情失败')
       } finally {
         this.loading = false
@@ -186,12 +194,26 @@ export default {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  height: calc(100vh - 80px);
+  overflow: hidden;
 
   .order-card {
-    .card-header {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    :deep(.el-card__header) {
+      padding: 15px 20px;
+      border-bottom: 1px solid #ebeef5;
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+
+    :deep(.el-card__body) {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
     }
 
     .section-title {
@@ -340,41 +362,44 @@ export default {
 
 @media screen and (max-width: 768px) {
   .order-detail-container {
-    .order-card {
-      .products-section {
-        .product-list {
-          .product-item {
-            flex-direction: column;
-            text-align: center;
+    padding: 10px;
+    height: calc(100vh - 60px);
+  }
 
-            img {
-              margin: 0 0 10px;
-            }
+  .order-card {
+    .products-section {
+      .product-list {
+        .product-item {
+          flex-direction: column;
+          text-align: center;
 
-            .product-info {
-              margin-bottom: 10px;
-            }
+          img {
+            margin: 0 0 10px;
+          }
 
-            .item-total {
-              margin-top: 10px;
-            }
+          .product-info {
+            margin-bottom: 10px;
+          }
+
+          .item-total {
+            margin-top: 10px;
           }
         }
       }
+    }
 
-      .amount-section {
-        .amount-item {
-          justify-content: space-between;
-        }
+    .amount-section {
+      .amount-item {
+        justify-content: space-between;
       }
+    }
 
-      .order-actions {
-        text-align: center;
+    .order-actions {
+      text-align: center;
 
-        .el-button {
-          width: 100%;
-          margin-bottom: 10px;
-        }
+      .el-button {
+        width: 100%;
+        margin-bottom: 10px;
       }
     }
   }

@@ -2,8 +2,8 @@ import { login, register, getUserInfo } from '@/api/shop/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 
 const state = {
-  token: getToken(),
-  isLoggedIn: !!getToken(),
+  token: getToken(true),
+  isLoggedIn: !!getToken(true),
   userInfo: null,
   username: ''
 }
@@ -20,12 +20,29 @@ const mutations = {
 }
 
 const actions = {
+  // 初始化用户状态
+  async initUserState({ commit, dispatch }) {
+    const token = getToken(true)
+    if (token) {
+      commit('SET_TOKEN', token)
+      try {
+        await dispatch('getUserInfo')
+      } catch (error) {
+        // 如果获取用户信息失败，可能是token过期，清除token
+        dispatch('logout')
+        throw error
+      }
+    }
+  },
+
   // 用户登录
-  async login({ commit }, userInfo) {
+  async login({ commit, dispatch }, userInfo) {
     const { data } = await login(userInfo)
     const { token } = data
     commit('SET_TOKEN', token)
-    setToken(token)
+    setToken(token, true)
+    // 登录后立即获取用户信息
+    await dispatch('getUserInfo')
     return data
   },
 
@@ -46,7 +63,7 @@ const actions = {
   logout({ commit }) {
     commit('SET_TOKEN', '')
     commit('SET_USER_INFO', null)
-    removeToken()
+    removeToken(true)
   }
 }
 

@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
+import { getToken } from '@/utils/auth'
 
 const request = axios.create({
   baseURL: 'http://localhost:3000/api/v1',
@@ -9,9 +10,18 @@ const request = axios.create({
 // 请求拦截器
 request.interceptors.request.use(
   config => {
-    console.log('Request config:', config)
-    // 添加token
-    const token = window.sessionStorage.getItem('token')
+    // 根据请求URL判断是否为商城接口
+    const isMallApi = config.url.startsWith('/mall/')
+    
+    let token
+    if (isMallApi) {
+      // 商城接口使用 auth.js 中的 getToken
+      token = getToken(true)
+    } else {
+      // 后台接口使用 sessionStorage 中的 token
+      token = sessionStorage.getItem('token')
+    }
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
@@ -26,7 +36,6 @@ request.interceptors.request.use(
 // 响应拦截器
 request.interceptors.response.use(
   response => {
-    console.log('Response:', response)
     // 如果是文件下载，直接返回
     if (response.config.responseType === 'blob') {
       return response

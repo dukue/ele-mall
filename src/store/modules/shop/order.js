@@ -24,11 +24,11 @@ const actions = {
   },
 
   // 获取订单列表
-  async getOrders({ commit }) {
-    const { data } = await getOrders()
+  async getOrders({ commit }, status) {
+    const { data } = await getOrders(status)
     commit('SET_ORDERS', {
       list: data.list,
-      total: data.total
+      total: data.total,
     })
     return data
   },

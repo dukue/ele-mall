@@ -3,6 +3,7 @@ import cart from './cart'
 import order from './order'
 import category from './category'
 import product from './product'
+import address from './address'
 
 export default {
   namespaced: true,
@@ -11,6 +12,7 @@ export default {
     cart,
     order,
     category,
-    product
+    product,
+    address
   }
 } 

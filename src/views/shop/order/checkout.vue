@@ -50,7 +50,7 @@
         <h3 class="section-title">商品清单</h3>
         <div class="product-list">
           <div v-for="item in selectedItems" :key="item.id" class="product-item">
-            <img :src="item.productImage" :alt="item.productName">
+            <img :src="getImageUrl(item.productImage)" :alt="item.productName">
             <div class="product-info">
               <h4>{{ item.productName }}</h4>
               <div class="price-quantity">
@@ -109,6 +109,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import { getImageUrl } from '@/utils/image'
 
 export default {
   name: 'Checkout',
@@ -140,11 +141,14 @@ export default {
     this.checkCartItems()
   },
   methods: {
+    getImageUrl(path) {
+      return getImageUrl(path)
+    },
     async getAddresses() {
       this.loading = true
       try {
-        const { data } = await this.$store.dispatch('shop/address/getAddresses')
-        this.addresses = data.list
+        const data = await this.$store.dispatch('shop/address/getAddresses')
+        this.addresses = data.list || []
         // 如果有默认地址，选中默认地址
         const defaultAddress = this.addresses.find(addr => addr.isDefault)
         if (defaultAddress) {
@@ -153,6 +157,7 @@ export default {
           this.selectedAddressId = this.addresses[0].id
         }
       } catch (error) {
+        console.error('获取地址列表失败:', error)
         this.$message.error('获取地址列表失败')
       } finally {
         this.loading = false
@@ -208,11 +213,25 @@ export default {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  height: calc(100vh - 80px);
+  overflow: hidden;
 
   .checkout-card {
-    .card-header {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    :deep(.el-card__header) {
+      padding: 15px 20px;
+      border-bottom: 1px solid #ebeef5;
       font-size: 18px;
       font-weight: bold;
+    }
+
+    :deep(.el-card__body) {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
     }
 
     .section-title {
@@ -361,32 +380,8 @@ export default {
 
 @media screen and (max-width: 768px) {
   .checkout-container {
-    .checkout-card {
-      .address-list {
-        grid-template-columns: 1fr;
-      }
-
-      .products-section {
-        .product-item {
-          flex-direction: column;
-          text-align: center;
-
-          img {
-            margin: 0 0 10px;
-          }
-
-          .product-info {
-            margin-bottom: 10px;
-          }
-        }
-      }
-
-      .submit-section {
-        .el-button {
-          width: 100%;
-        }
-      }
-    }
+    padding: 10px;
+    height: calc(100vh - 60px);
   }
 }
 </style> 

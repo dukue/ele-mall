@@ -20,7 +20,6 @@ const mutations = {
     state.total = total
   },
   SET_CURRENT_PRODUCT: (state, product) => {
-    console.log('Setting current product:', product)
     if (product) {
       state.currentProduct = {
         ...product,
@@ -37,9 +36,7 @@ const mutations = {
 const actions = {
   async getProducts({ commit }, params) {
     try {
-      console.log('Fetching products with params:', params)
       const response = await getProducts(params)
-      console.log('Products response:', response)
       if (response.code === 200 && response.data) {
         commit('SET_PRODUCTS', {
           list: response.data.list || [],
@@ -57,9 +54,7 @@ const actions = {
 
   async getProductDetail({ commit }, id) {
     try {
-      console.log('Fetching product detail for id:', id)
       const response = await getProductDetail(id)
-      console.log('Product detail response:', response)
       if (response.data) {
         commit('SET_CURRENT_PRODUCT', response.data)
         return response.data

@@ -9,15 +9,27 @@ export default {
       meta: { title: '商城首页' }
     },
     {
+      path: 'login',
+      name: 'ShopLogin',
+      component: () => import('@/views/shop/user/login'),
+      meta: { title: '用户登录' }
+    },
+    {
+      path: 'register',
+      name: 'ShopRegister',
+      component: () => import('@/views/shop/user/register'),
+      meta: { title: '用户注册' }
+    },
+    {
       path: 'products',
       name: 'ProductList',
-      component: () => import('@/views/shop/product/list'),
+      component: () => import('@/views/shop/products/ProductList'),
       meta: { title: '商品列表' }
     },
     {
       path: 'product/:id',
       name: 'ProductDetail',
-      component: () => import('@/views/shop/product/detail'),
+      component: () => import('@/views/shop/products/ProductDetail'),
       meta: { title: '商品详情' }
     },
     {
